@@ -146,22 +146,13 @@ public class PaintingView extends View {
         }
     }
 
-    private class PaintingOnScaleGestureListener implements ScaleGestureDetector.OnScaleGestureListener {
+    private class PaintingOnScaleGestureListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         private final String TAG = PaintingOnScaleGestureListener.class.getSimpleName();
 
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
             scale(detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
             return true;
-        }
-
-        @Override
-        public boolean onScaleBegin(ScaleGestureDetector detector) {
-            return true;
-        }
-
-        @Override
-        public void onScaleEnd(ScaleGestureDetector detector) {
         }
     }
 }
