@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PointF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -12,6 +13,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+
+import java.util.ArrayList;
 
 public class PaintingView extends View {
     private static final String TAG = PaintingView.class.getSimpleName();
@@ -36,6 +39,9 @@ public class PaintingView extends View {
     private float minScale;
     private float maxScale;
     private Matrix matrix;
+    private Matrix inverseMatrix = new Matrix();
+
+    private ArrayList<PointF> clicks = new ArrayList<>();
 
     public PaintingView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -71,6 +77,10 @@ public class PaintingView extends View {
     protected void onDraw(Canvas canvas) {
         canvas.setMatrix(matrix);
         drawPainting(canvas, painting);
+
+        for (PointF click : clicks) {
+            canvas.drawCircle(click.x, click.y, 10, yellow);
+        }
     }
 
     private void drawPainting(Canvas canvas, Painting painting) {
@@ -151,7 +161,18 @@ public class PaintingView extends View {
     private float getScale() {
         matrix.getValues(matrixValues);
         return (matrixValues[Matrix.MSCALE_X] + matrixValues[Matrix.MSCALE_Y]) / 2;
+    }
 
+    private void onClick(float x, float y) {
+        clicks.add(toPaintingPoint(x, y));
+        postInvalidate();
+    }
+
+    private PointF toPaintingPoint(float x, float y) {
+        float point[] = new float[] {x, y};
+        matrix.invert(inverseMatrix);
+        inverseMatrix.mapPoints(point);
+        return new PointF(point[0], point[1]);
     }
 
     @Override
@@ -176,7 +197,7 @@ public class PaintingView extends View {
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            Log.d(TAG, "onSingleTapConfirmed: " + e);
+            onClick(e.getX(), e.getY());
             return true;
         }
 
