@@ -31,6 +31,10 @@ public class PaintingView extends View {
     private final GestureDetector gestureDetector;
 
     private Painting painting;
+
+    private final float[] matrixValues = new float[9];
+    private float minScale;
+    private float maxScale;
     private Matrix matrix;
 
     public PaintingView(Context context, @Nullable AttributeSet attrs) {
@@ -96,7 +100,34 @@ public class PaintingView extends View {
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-//        initPaths();
+        fitPaintingToScreen();
+    }
+
+    private void fitPaintingToScreen() {
+        float screenWidth = getWidth();
+        float screenHeight = getHeight();
+        float screenRatio = screenHeight / screenWidth;
+        float screenCenterX = getX() + screenWidth / 2;
+        float screenCenterY = getY() + screenHeight / 2;
+        float paintingMinX = painting.getMinX();
+        float paintingMinY = painting.getMinY();
+        float paintingWidth = painting.getWidth();
+        float paintingHeight = painting.getHeight();
+        float paintingRatio = paintingHeight / paintingWidth;
+        float paintingCenterX = paintingMinX + paintingWidth / 2;
+        float paintingCenterY = paintingMinY + paintingHeight / 2;
+
+
+        float tx = screenCenterX - paintingCenterX;
+        float ty = screenCenterY - paintingCenterY;
+        float scale = screenRatio > paintingRatio
+            ? screenWidth / paintingWidth
+            : screenHeight / paintingHeight;
+
+        matrix.setTranslate(tx, ty);
+        matrix.setScale(scale, scale, paintingCenterX, paintingCenterY);
+        minScale = scale;
+        maxScale = scale * 4;
     }
 
     private void translate(float dx, float dy) {
@@ -105,8 +136,22 @@ public class PaintingView extends View {
     }
 
     private void scale(float factor, float fx, float fy) {
+        float currentScale = getScale();
+        float newScale = currentScale * factor;
+        if (newScale < minScale) {
+            factor = minScale / currentScale;
+        }
+        else if (newScale > maxScale) {
+            factor = maxScale / currentScale;
+        }
         matrix.postScale(factor, factor, fx, fy);
         postInvalidate();
+    }
+
+    private float getScale() {
+        matrix.getValues(matrixValues);
+        return (matrixValues[Matrix.MSCALE_X] + matrixValues[Matrix.MSCALE_Y]) / 2;
+
     }
 
     @Override

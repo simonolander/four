@@ -21,9 +21,10 @@ public class Painting {
 
     public static Painting somePainting() {
         Painting painting = new Painting();
-        Polygon triangle = Polygon.triangle(540, 760, 50);
-        Polygon circle = Polygon.circle(540, 760, 150);
-        Polygon rectangle = Polygon.rectangle(540, 760, 540, 760);
+        float cx = 500, cy = 900;
+        Polygon triangle = Polygon.triangle(cx, cy, 50);
+        Polygon circle = Polygon.circle(cx, cy, 150);
+        Polygon rectangle = Polygon.rectangle(cx, cy, cx, cy);
         PaintRegion triangleRegion = new PaintRegion(triangle);
         PaintRegion circleRegion = new PaintRegion(circle, triangle);
         PaintRegion rectangleRegion = new PaintRegion(rectangle, circle);
@@ -37,6 +38,54 @@ public class Painting {
         painting.neighboursList.add(Arrays.asList(0, 2));
         painting.neighboursList.add(Arrays.asList(1));
         return painting;
+    }
+
+    public float getWidth() {
+        return getMaxX() - getMinX();
+    }
+
+    public float getHeight() {
+        return getMaxY() - getMinY();
+    }
+
+    public float getMinX() {
+        float minX = Float.POSITIVE_INFINITY;
+        for (PaintRegion region : regions) {
+            for (PointF point : region.base.points) {
+                minX = Math.min(minX, point.x);
+            }
+        }
+        return minX;
+    }
+
+    public float getMaxX() {
+        float maxX = Float.NEGATIVE_INFINITY;
+        for (PaintRegion region : regions) {
+            for (PointF point : region.base.points) {
+                maxX = Math.max(maxX, point.x);
+            }
+        }
+        return maxX;
+    }
+
+    public float getMinY() {
+        float minY = Float.POSITIVE_INFINITY;
+        for (PaintRegion region : regions) {
+            for (PointF point : region.base.points) {
+                minY = Math.min(minY, point.y);
+            }
+        }
+        return minY;
+    }
+
+    public float getMaxY() {
+        float maxY = Float.NEGATIVE_INFINITY;
+        for (PaintRegion region : regions) {
+            for (PointF point : region.base.points) {
+                maxY = Math.max(maxY, point.y);
+            }
+        }
+        return maxY;
     }
 
     public static class PaintRegion {
