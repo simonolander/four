@@ -3,11 +3,14 @@ package se.olander.android.four;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 
 public class PaintingView extends View {
@@ -24,7 +27,11 @@ public class PaintingView extends View {
         red, green, blue, yellow
     };
 
+    private final ScaleGestureDetector scaleGestureDetector;
+    private final GestureDetector gestureDetector;
+
     private Painting painting;
+    private Matrix matrix;
 
     public PaintingView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -41,6 +48,11 @@ public class PaintingView extends View {
         border.setStyle(Paint.Style.STROKE);
         border.setStrokeWidth(5);
         border.setAntiAlias(true);
+
+        matrix = new Matrix();
+        scaleGestureDetector = new ScaleGestureDetector(getContext(), new PaintingOnScaleGestureListener());
+        gestureDetector = new GestureDetector(getContext(), new PaintingOnGestureListener());
+        gestureDetector.setOnDoubleTapListener(new PaintingOnDoubleTapListener());
     }
 
     public Painting getPainting() {
@@ -53,6 +65,7 @@ public class PaintingView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        canvas.setMatrix(matrix);
         drawPainting(canvas, painting);
     }
 
@@ -86,9 +99,69 @@ public class PaintingView extends View {
 //        initPaths();
     }
 
+    private void translate(float dx, float dy) {
+        matrix.postTranslate(dx, dy);
+        postInvalidate();
+    }
+
+    private void scale(float factor, float fx, float fy) {
+        matrix.postScale(factor, factor, fx, fy);
+        postInvalidate();
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        Log.d(TAG, "onTouchEvent: " + event);
-        return true;
+        boolean retVal = scaleGestureDetector.onTouchEvent(event);
+        retVal = gestureDetector.onTouchEvent(event) || retVal;
+        return retVal || super.onTouchEvent(event);
+    }
+
+    private class PaintingOnGestureListener extends GestureDetector.SimpleOnGestureListener {
+        private final String TAG = PaintingOnGestureListener.class.getSimpleName();
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            translate(-distanceX, -distanceY);
+            return true;
+        }
+    }
+
+    private class PaintingOnDoubleTapListener implements GestureDetector.OnDoubleTapListener {
+        private final String TAG = PaintingOnDoubleTapListener.class.getSimpleName();
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            Log.d(TAG, "onSingleTapConfirmed: " + e);
+            return true;
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            return true;
+        }
+
+        @Override
+        public boolean onDoubleTapEvent(MotionEvent e) {
+            return false;
+        }
+    }
+
+    private class PaintingOnScaleGestureListener implements ScaleGestureDetector.OnScaleGestureListener {
+        private final String TAG = PaintingOnScaleGestureListener.class.getSimpleName();
+
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            scale(detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
+            return true;
+        }
+
+        @Override
+        public boolean onScaleBegin(ScaleGestureDetector detector) {
+            return true;
+        }
+
+        @Override
+        public void onScaleEnd(ScaleGestureDetector detector) {
+        }
     }
 }
