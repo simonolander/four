@@ -2,6 +2,7 @@ package se.olander.android.four;
 
 import android.graphics.Path;
 import android.graphics.PointF;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +41,16 @@ public class Painting {
         return painting;
     }
 
+    @Nullable
+    public PaintRegion getRegion(PointF point) {
+        for (PaintRegion region : regions) {
+            if (region.containsPoint(point.x, point.y)) {
+                return region;
+            }
+        }
+        return null;
+    }
+
     public float getWidth() {
         return getMaxX() - getMinX();
     }
@@ -51,9 +62,7 @@ public class Painting {
     public float getMinX() {
         float minX = Float.POSITIVE_INFINITY;
         for (PaintRegion region : regions) {
-            for (PointF point : region.base.points) {
-                minX = Math.min(minX, point.x);
-            }
+            minX = Math.min(minX, region.base.minX);
         }
         return minX;
     }
@@ -61,9 +70,7 @@ public class Painting {
     public float getMaxX() {
         float maxX = Float.NEGATIVE_INFINITY;
         for (PaintRegion region : regions) {
-            for (PointF point : region.base.points) {
-                maxX = Math.max(maxX, point.x);
-            }
+            maxX = Math.max(maxX, region.base.maxX);
         }
         return maxX;
     }
@@ -71,9 +78,7 @@ public class Painting {
     public float getMinY() {
         float minY = Float.POSITIVE_INFINITY;
         for (PaintRegion region : regions) {
-            for (PointF point : region.base.points) {
-                minY = Math.min(minY, point.y);
-            }
+            minY = Math.min(minY, region.base.minY);
         }
         return minY;
     }
@@ -81,9 +86,7 @@ public class Painting {
     public float getMaxY() {
         float maxY = Float.NEGATIVE_INFINITY;
         for (PaintRegion region : regions) {
-            for (PointF point : region.base.points) {
-                maxY = Math.max(maxY, point.y);
-            }
+            maxY = Math.max(maxY, region.base.maxY);
         }
         return maxY;
     }
@@ -96,25 +99,81 @@ public class Painting {
             this.base = base;
             this.holes.addAll(Arrays.asList(holes));
         }
+
+        public boolean containsPoint(float x, float y) {
+            if (base.containsPoint(x, y)) {
+                for (Polygon hole : holes) {
+                    if (hole.containsPoint(x, y)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
     }
 
     public static class Polygon {
-        final ArrayList<PointF> points = new ArrayList<>();
+        final ArrayList<PointF> points;
+        final float minX, maxX, minY, maxY;
+        final Path path;
 
-        public Path getPath() {
-            Path path = new Path();
+        public Polygon(ArrayList<PointF> points) {
+            if (points.isEmpty()) throw new IllegalArgumentException();
+
+            this.points = points;
+            float minX = Float.POSITIVE_INFINITY;
+            for (PointF point : points) {
+                minX = Math.min(point.x, minX);
+            }
+            float maxX = Float.NEGATIVE_INFINITY;
+            for (PointF point : points) {
+                maxX = Math.max(point.x, maxX);
+            }
+            float minY = Float.POSITIVE_INFINITY;
+            for (PointF point : points) {
+                minY = Math.min(point.y, minY);
+            }
+            float maxY = Float.NEGATIVE_INFINITY;
+            for (PointF point : points) {
+                maxY = Math.max(point.y, maxY);
+            }
+
+            this.minX = minX;
+            this.maxX = maxX;
+            this.minY = minY;
+            this.maxY = maxY;
+
+            this.path = new Path();
             boolean first = true;
             for (PointF point : points) {
                 if (first) {
-                    path.moveTo(point.x, point.y);
+                    this.path.moveTo(point.x, point.y);
                     first = false;
                 }
                 else {
-                    path.lineTo(point.x, point.y);
+                    this.path.lineTo(point.x, point.y);
                 }
             }
-            path.close();
-            return path;
+            this.path.close();
+        }
+
+        public boolean containsPoint(float x, float y) {
+            float farawayX = maxX + 1000;
+            float farawayY = maxY + 1000;
+            boolean containsPoint = false;
+            for (int i = 0; i < points.size(); i++) {
+                PointF p1 = points.get(i);
+                PointF p2 = points.get((i + 1) % points.size());
+
+                if (MathUtils.linesIntersect(x, y, farawayX, farawayY, p1.x, p1.y, p2.x, p2.y)) {
+                    containsPoint = !containsPoint;
+                }
+            }
+
+            return containsPoint;
         }
 
         public static Polygon circle(float cx, float cy, float r) {
@@ -122,23 +181,23 @@ public class Painting {
         }
 
         public static Polygon circle(float cx, float cy, float r, int numPoints) {
-            Polygon circle = new Polygon();
+            ArrayList<PointF> points = new ArrayList<>();
             for (int i = 0; i < numPoints; i++) {
                 double angle = 2 * Math.PI * i / numPoints;
                 double x = cx + Math.cos(angle) * r;
                 double y = cy + Math.sin(angle) * r;
-                circle.points.add(new PointF((float) x, (float) y));
+                points.add(new PointF((float) x, (float) y));
             }
-            return circle;
+            return new Polygon(points);
         }
 
         public static Polygon rectangle(float cx, float cy, float rx, float ry) {
-            Polygon rectangle = new Polygon();
-            rectangle.points.add(new PointF(cx - rx, cy - ry));
-            rectangle.points.add(new PointF(cx + rx, cy - ry));
-            rectangle.points.add(new PointF(cx + rx, cy + ry));
-            rectangle.points.add(new PointF(cx - rx, cy + ry));
-            return rectangle;
+            ArrayList<PointF> points = new ArrayList<>();
+            points.add(new PointF(cx - rx, cy - ry));
+            points.add(new PointF(cx + rx, cy - ry));
+            points.add(new PointF(cx + rx, cy + ry));
+            points.add(new PointF(cx - rx, cy + ry));
+            return new Polygon(points);
         }
 
         public static Polygon triangle(float cx, float cy, float r) {

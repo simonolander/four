@@ -63,6 +63,7 @@ public class PaintingView extends View {
         scaleGestureDetector = new ScaleGestureDetector(getContext(), new PaintingOnScaleGestureListener());
         gestureDetector = new GestureDetector(getContext(), new PaintingOnGestureListener());
         gestureDetector.setOnDoubleTapListener(new PaintingOnDoubleTapListener());
+        gestureDetector.setIsLongpressEnabled(false);
     }
 
     public Painting getPainting() {
@@ -95,17 +96,17 @@ public class PaintingView extends View {
     private void fillRegion(Canvas canvas, Painting.PaintRegion region, Integer color) {
         if (color != null) {
             canvas.save();
-            canvas.clipPath(region.base.getPath());
+            canvas.clipPath(region.base.path);
             for (Painting.Polygon hole : region.holes) {
-                canvas.clipOutPath(hole.getPath());
+                canvas.clipOutPath(hole.path);
             }
-            canvas.drawPath(region.base.getPath(), colors[color]);
+            canvas.drawPath(region.base.path, colors[color]);
             canvas.restore();
         }
     }
 
     private void strokeRegion(Canvas canvas, Painting.PaintRegion region) {
-        canvas.drawPath(region.base.getPath(), border);
+        canvas.drawPath(region.base.path, border);
     }
 
     @Override
@@ -164,7 +165,28 @@ public class PaintingView extends View {
     }
 
     private void onClick(float x, float y) {
-        clicks.add(toPaintingPoint(x, y));
+        PointF point = toPaintingPoint(x, y);
+//        clicks.add(point);
+        Painting.PaintRegion region = painting.getRegion(point);
+        if (region == null) {
+            return;
+        }
+        Integer currentColor = painting.colors.get(region);
+        if (currentColor == null) {
+            painting.colors.put(region, 0);
+        }
+        else if (currentColor == 0) {
+            painting.colors.put(region, 1);
+        }
+        else if (currentColor == 1) {
+            painting.colors.put(region, 2);
+        }
+        else if (currentColor == 2) {
+            painting.colors.put(region, 3);
+        }
+        else if (currentColor == 3) {
+            painting.colors.put(region, null);
+        }
         postInvalidate();
     }
 
