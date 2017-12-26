@@ -8,26 +8,23 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
-import java.util.ArrayList;
-
 public class PaintingView extends View {
     private static final String TAG = PaintingView.class.getSimpleName();
 
     private final Paint
-        red = new Paint(),
-        green = new Paint(),
-        blue = new Paint(),
-        yellow = new Paint(),
+        paint1 = new Paint(),
+        paint2 = new Paint(),
+        paint3 = new Paint(),
+        paint4 = new Paint(),
         border = new Paint();
 
     private final Paint[] colors = new Paint[] {
-        red, green, blue, yellow
+        paint1, paint2, paint3, paint4
     };
 
     private final ScaleGestureDetector scaleGestureDetector;
@@ -41,19 +38,21 @@ public class PaintingView extends View {
     private Matrix matrix;
     private Matrix inverseMatrix = new Matrix();
 
-    private ArrayList<PointF> clicks = new ArrayList<>();
+    private Painting.PaintRegion currentSelectedRegion;
+
+    private OnSelectedRegionChangedListener onSelectedRegionChangedListener;
 
     public PaintingView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
-        red.setColor(Color.RED);
-        red.setAntiAlias(true);
-        green.setColor(Color.GREEN);
-        green.setAntiAlias(true);
-        blue.setColor(Color.BLUE);
-        blue.setAntiAlias(true);
-        yellow.setColor(Color.YELLOW);
-        yellow.setAntiAlias(true);
+        paint1.setColor(Color.RED);
+        paint1.setAntiAlias(true);
+        paint2.setColor(Color.GREEN);
+        paint2.setAntiAlias(true);
+        paint3.setColor(Color.BLUE);
+        paint3.setAntiAlias(true);
+        paint4.setColor(Color.YELLOW);
+        paint4.setAntiAlias(true);
         border.setColor(Color.BLACK);
         border.setStyle(Paint.Style.STROKE);
         border.setStrokeWidth(5);
@@ -78,10 +77,6 @@ public class PaintingView extends View {
     protected void onDraw(Canvas canvas) {
         canvas.setMatrix(matrix);
         drawPainting(canvas, painting);
-
-        for (PointF click : clicks) {
-            canvas.drawCircle(click.x, click.y, 10, yellow);
-        }
     }
 
     private void drawPainting(Canvas canvas, Painting painting) {
@@ -166,27 +161,20 @@ public class PaintingView extends View {
 
     private void onClick(float x, float y) {
         PointF point = toPaintingPoint(x, y);
-//        clicks.add(point);
         Painting.PaintRegion region = painting.getRegion(point);
-        if (region == null) {
+        currentSelectedRegion = region;
+        if (this.onSelectedRegionChangedListener != null) {
+            this.onSelectedRegionChangedListener.onSelectedRegionChanged();
+        }
+        postInvalidate();
+    }
+
+    public void setSelectedRegionColor(int colorIndex) {
+        if (this.currentSelectedRegion == null) {
             return;
         }
-        Integer currentColor = painting.colors.get(region);
-        if (currentColor == null) {
-            painting.colors.put(region, 0);
-        }
-        else if (currentColor == 0) {
-            painting.colors.put(region, 1);
-        }
-        else if (currentColor == 1) {
-            painting.colors.put(region, 2);
-        }
-        else if (currentColor == 2) {
-            painting.colors.put(region, 3);
-        }
-        else if (currentColor == 3) {
-            painting.colors.put(region, null);
-        }
+
+        painting.colors.put(this.currentSelectedRegion, colorIndex);
         postInvalidate();
     }
 
@@ -202,6 +190,17 @@ public class PaintingView extends View {
         boolean retVal = scaleGestureDetector.onTouchEvent(event);
         retVal = gestureDetector.onTouchEvent(event) || retVal;
         return retVal || super.onTouchEvent(event);
+    }
+
+    public void setColors(int color1, int color2, int color3, int color4) {
+        paint1.setColor(color1);
+        paint2.setColor(color2);
+        paint3.setColor(color3);
+        paint4.setColor(color4);
+    }
+
+    public void setOnSelectedRegionChangedListener(OnSelectedRegionChangedListener listener) {
+        this.onSelectedRegionChangedListener = listener;
     }
 
     private class PaintingOnGestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -242,5 +241,9 @@ public class PaintingView extends View {
             scale(detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
             return true;
         }
+    }
+
+    public interface OnSelectedRegionChangedListener {
+        void onSelectedRegionChanged();
     }
 }
