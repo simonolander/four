@@ -39,7 +39,6 @@ public class PaintingView extends View {
     private Matrix inverseMatrix = new Matrix();
 
     private Painting.PaintRegion currentSelectedRegion;
-    private long currentSelectedRegionTime;
 
     private OnSelectedRegionChangedListener onSelectedRegionChangedListener;
 
@@ -104,24 +103,53 @@ public class PaintingView extends View {
 
     private int getCurrentSelectedRegionColor() {
         long currentCycleTime = System.currentTimeMillis() % COLOR_ANIMATION_TIME_MILLIS;
-        long currentColorTime = currentCycleTime % (COLOR_ANIMATION_TIME_MILLIS / 4);
-        double t = (double) currentColorTime / (COLOR_ANIMATION_TIME_MILLIS / 4);
+        double t;
         int fromColor, toColor;
-        if (currentCycleTime > COLOR_ANIMATION_TIME_MILLIS / 4 * 3) {
-            fromColor = color4;
-            toColor = color1;
-        }
-        else if (currentCycleTime > COLOR_ANIMATION_TIME_MILLIS / 2) {
-            fromColor = color3;
-            toColor = color4;
-        }
-        else if (currentCycleTime > COLOR_ANIMATION_TIME_MILLIS / 4) {
-            fromColor = color2;
-            toColor = color3;
+        if (painting.colors.get(currentSelectedRegion) == null) {
+            long currentColorTime = currentCycleTime % (COLOR_ANIMATION_TIME_MILLIS / 4);
+            t = (double) currentColorTime / (COLOR_ANIMATION_TIME_MILLIS / 4);
+            if (currentCycleTime > COLOR_ANIMATION_TIME_MILLIS / 4 * 3) {
+                fromColor = color4;
+                toColor = color1;
+            }
+            else if (currentCycleTime > COLOR_ANIMATION_TIME_MILLIS / 2) {
+                fromColor = color3;
+                toColor = color4;
+            }
+            else if (currentCycleTime > COLOR_ANIMATION_TIME_MILLIS / 4) {
+                fromColor = color2;
+                toColor = color3;
+            }
+            else {
+                fromColor = color1;
+                toColor = color2;
+            }
         }
         else {
-            fromColor = color1;
-            toColor = color2;
+            long currentColorTime = currentCycleTime % (COLOR_ANIMATION_TIME_MILLIS / 4);
+            t = (double) currentColorTime / (COLOR_ANIMATION_TIME_MILLIS / 4);
+            switch (painting.colors.get(currentSelectedRegion)) {
+                case 0:
+                    fromColor = toColor = color1;
+                    break;
+                case 1:
+                    fromColor = toColor = color2;
+                    break;
+                case 2:
+                    fromColor = toColor = color3;
+                    break;
+                case 3:
+                    fromColor = toColor = color4;
+                    break;
+                default:
+                    fromColor = toColor = Color.BLACK;
+            }
+            if (t < 0.5) {
+                toColor = Color.WHITE;
+            }
+            else {
+                fromColor = Color.WHITE;
+            }
         }
         return MathUtils.interpolateRGB(fromColor, toColor, t);
     }
@@ -189,7 +217,6 @@ public class PaintingView extends View {
 
     public void setCurrentSelectedRegion(Painting.PaintRegion currentSelectedRegion) {
         this.currentSelectedRegion = currentSelectedRegion;
-        this.currentSelectedRegionTime = System.currentTimeMillis();
 
         removeCallbacks(animateRunnable);
         if (this.currentSelectedRegion != null) {
