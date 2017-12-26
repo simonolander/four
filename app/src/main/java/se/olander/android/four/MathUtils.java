@@ -1,8 +1,6 @@
 package se.olander.android.four;
 
-/**
- * Created by sios on 2017-12-25.
- */
+import android.graphics.Color;
 
 public abstract class MathUtils {
 
@@ -10,22 +8,14 @@ public abstract class MathUtils {
      * Tells whether the two line segments cross.
      * From https://android.googlesource.com/platform/frameworks/native/+/e09fd9e/awt/java/awt/geom/Line2D.java
      *
-     * @param x1
-     *            the x coordinate of the starting point of the first segment.
-     * @param y1
-     *            the y coordinate of the starting point of the first segment.
-     * @param x2
-     *            the x coordinate of the end point of the first segment.
-     * @param y2
-     *            the y coordinate of the end point of the first segment.
-     * @param x3
-     *            the x coordinate of the starting point of the second segment.
-     * @param y3
-     *            the y coordinate of the starting point of the second segment.
-     * @param x4
-     *            the x coordinate of the end point of the second segment.
-     * @param y4
-     *            the y coordinate of the end point of the second segment.
+     * @param x1 the x coordinate of the starting point of the first segment.
+     * @param y1 the y coordinate of the starting point of the first segment.
+     * @param x2 the x coordinate of the end point of the first segment.
+     * @param y2 the y coordinate of the end point of the first segment.
+     * @param x3 the x coordinate of the starting point of the second segment.
+     * @param y3 the y coordinate of the starting point of the second segment.
+     * @param x4 the x coordinate of the end point of the second segment.
+     * @param y4 the y coordinate of the end point of the second segment.
      * @return true, if the two line segments cross.
      */
     public static boolean linesIntersect(
@@ -68,5 +58,24 @@ public abstract class MathUtils {
         }
         float BvC = x3 * y4 - x4 * y3;
         return (AvB * AvC <= 0.0) && (BvC * (AvB + BvC - AvC) <= 0.0);
+    }
+
+    public static int interpolateRGB(int from, int to, double t) {
+        int fromAlpha = Color.alpha(from);
+        int fromRed = Color.red(from);
+        int fromGreen = Color.green(from);
+        int fromBlue = Color.blue(from);
+
+        int toAlpha = Color.alpha(to);
+        int toRed = Color.red(to);
+        int toGreen = Color.green(to);
+        int toBlue = Color.blue(to);
+
+        int alpha = (int) (fromAlpha + (toAlpha - fromAlpha) * t);
+        int red = (int) (fromRed + (toRed - fromRed) * t);
+        int green = (int) (fromGreen + (toGreen - fromGreen) * t);
+        int blue = (int) (fromBlue + (toBlue - fromBlue) * t);
+
+        return Color.argb(alpha, red, green, blue);
     }
 }

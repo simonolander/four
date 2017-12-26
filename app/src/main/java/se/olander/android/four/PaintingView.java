@@ -15,17 +15,17 @@ import android.view.View;
 
 public class PaintingView extends View {
     private static final String TAG = PaintingView.class.getSimpleName();
+    private static final long COLOR_ANIMATION_TIME_MILLIS = 5000;
+    private static final long COLOR_ANIMATION_WAIT_MILLIS = 20;
 
     private final Paint
-        paint1 = new Paint(),
-        paint2 = new Paint(),
-        paint3 = new Paint(),
-        paint4 = new Paint(),
+        fillPaint = new Paint(),
         border = new Paint();
 
-    private final Paint[] colors = new Paint[] {
-        paint1, paint2, paint3, paint4
-    };
+    private int color1 = Color.RED;
+    private int color2 = Color.GREEN;
+    private int color3 = Color.BLUE;
+    private int color4 = Color.YELLOW;
 
     private final ScaleGestureDetector scaleGestureDetector;
     private final GestureDetector gestureDetector;
@@ -39,20 +39,14 @@ public class PaintingView extends View {
     private Matrix inverseMatrix = new Matrix();
 
     private Painting.PaintRegion currentSelectedRegion;
+    private long currentSelectedRegionTime;
 
     private OnSelectedRegionChangedListener onSelectedRegionChangedListener;
 
     public PaintingView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
-        paint1.setColor(Color.RED);
-        paint1.setAntiAlias(true);
-        paint2.setColor(Color.GREEN);
-        paint2.setAntiAlias(true);
-        paint3.setColor(Color.BLUE);
-        paint3.setAntiAlias(true);
-        paint4.setColor(Color.YELLOW);
-        paint4.setAntiAlias(true);
+        fillPaint.setAntiAlias(true);
         border.setColor(Color.BLACK);
         border.setStyle(Paint.Style.STROKE);
         border.setStrokeWidth(5);
@@ -81,27 +75,55 @@ public class PaintingView extends View {
 
     private void drawPainting(Canvas canvas, Painting painting) {
         for (Painting.PaintRegion region : painting.regions) {
-            fillRegion(canvas, region, painting.colors.get(region));
+            if (region == currentSelectedRegion) {
+                fillRegion(canvas, region, getCurrentSelectedRegionColor());
+            }
+            else if (painting.colors.get(region) != null) {
+                fillRegion(canvas, region, painting.colors.get(region));
+            }
         }
         for (Painting.PaintRegion region : painting.regions) {
             strokeRegion(canvas, region);
         }
     }
 
-    private void fillRegion(Canvas canvas, Painting.PaintRegion region, Integer color) {
-        if (color != null) {
-            canvas.save();
-            canvas.clipPath(region.base.path);
-            for (Painting.Polygon hole : region.holes) {
-                canvas.clipOutPath(hole.path);
-            }
-            canvas.drawPath(region.base.path, colors[color]);
-            canvas.restore();
+    private void fillRegion(Canvas canvas, Painting.PaintRegion region, int color) {
+        canvas.save();
+        canvas.clipPath(region.base.path);
+        for (Painting.Polygon hole : region.holes) {
+            canvas.clipOutPath(hole.path);
         }
+        fillPaint.setColor(color);
+        canvas.drawPath(region.base.path, fillPaint);
+        canvas.restore();
     }
 
     private void strokeRegion(Canvas canvas, Painting.PaintRegion region) {
         canvas.drawPath(region.base.path, border);
+    }
+
+    private int getCurrentSelectedRegionColor() {
+        long currentCycleTime = System.currentTimeMillis() % COLOR_ANIMATION_TIME_MILLIS;
+        long currentColorTime = currentCycleTime % (COLOR_ANIMATION_TIME_MILLIS / 4);
+        double t = (double) currentColorTime / (COLOR_ANIMATION_TIME_MILLIS / 4);
+        int fromColor, toColor;
+        if (currentCycleTime > COLOR_ANIMATION_TIME_MILLIS / 4 * 3) {
+            fromColor = color4;
+            toColor = color1;
+        }
+        else if (currentCycleTime > COLOR_ANIMATION_TIME_MILLIS / 2) {
+            fromColor = color3;
+            toColor = color4;
+        }
+        else if (currentCycleTime > COLOR_ANIMATION_TIME_MILLIS / 4) {
+            fromColor = color2;
+            toColor = color3;
+        }
+        else {
+            fromColor = color1;
+            toColor = color2;
+        }
+        return MathUtils.interpolateRGB(fromColor, toColor, t);
     }
 
     @Override
@@ -161,12 +183,18 @@ public class PaintingView extends View {
 
     private void onClick(float x, float y) {
         PointF point = toPaintingPoint(x, y);
-        Painting.PaintRegion region = painting.getRegion(point);
-        currentSelectedRegion = region;
-        if (this.onSelectedRegionChangedListener != null) {
-            this.onSelectedRegionChangedListener.onSelectedRegionChanged();
-        }
+        setCurrentSelectedRegion(painting.getRegion(point));
         postInvalidate();
+    }
+
+    public void setCurrentSelectedRegion(Painting.PaintRegion currentSelectedRegion) {
+        this.currentSelectedRegion = currentSelectedRegion;
+        this.currentSelectedRegionTime = System.currentTimeMillis();
+
+        removeCallbacks(animateRunnable);
+        if (this.currentSelectedRegion != null) {
+            post(animateRunnable);
+        }
     }
 
     public void setSelectedRegionColor(int colorIndex) {
@@ -193,10 +221,10 @@ public class PaintingView extends View {
     }
 
     public void setColors(int color1, int color2, int color3, int color4) {
-        paint1.setColor(color1);
-        paint2.setColor(color2);
-        paint3.setColor(color3);
-        paint4.setColor(color4);
+        this.color1 = color1;
+        this.color2 = color2;
+        this.color3 = color3;
+        this.color4 = color4;
     }
 
     public void setOnSelectedRegionChangedListener(OnSelectedRegionChangedListener listener) {
@@ -242,6 +270,15 @@ public class PaintingView extends View {
             return true;
         }
     }
+
+    private final Runnable animateRunnable =  new Runnable() {
+
+        @Override
+        public void run() {
+            postInvalidate();
+            postDelayed(this, COLOR_ANIMATION_WAIT_MILLIS);
+        }
+    };
 
     public interface OnSelectedRegionChangedListener {
         void onSelectedRegionChanged();
