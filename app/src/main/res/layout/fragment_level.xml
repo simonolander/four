@@ -8,9 +8,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <!--<ImageView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:src="@drawable/ic_fourcolour"/>-->
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/color_one"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"/>
 
 </RelativeLayout>
