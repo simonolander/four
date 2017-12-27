@@ -78,7 +78,7 @@ public class PaintingView extends View {
                 fillRegion(canvas, region, getCurrentSelectedRegionColor());
             }
             else if (painting.colors.get(region) != null) {
-                fillRegion(canvas, region, painting.colors.get(region));
+                fillRegion(canvas, region, getColor(painting.colors.get(region)));
             }
         }
         for (Painting.PaintRegion region : painting.regions) {
@@ -128,22 +128,7 @@ public class PaintingView extends View {
         else {
             long currentColorTime = currentCycleTime % (COLOR_ANIMATION_TIME_MILLIS / 4);
             t = (double) currentColorTime / (COLOR_ANIMATION_TIME_MILLIS / 4);
-            switch (painting.colors.get(currentSelectedRegion)) {
-                case 0:
-                    fromColor = toColor = color1;
-                    break;
-                case 1:
-                    fromColor = toColor = color2;
-                    break;
-                case 2:
-                    fromColor = toColor = color3;
-                    break;
-                case 3:
-                    fromColor = toColor = color4;
-                    break;
-                default:
-                    fromColor = toColor = Color.BLACK;
-            }
+            fromColor = toColor = getColor(painting.colors.get(currentSelectedRegion));
             if (t < 0.5) {
                 toColor = Color.WHITE;
             }
@@ -224,13 +209,24 @@ public class PaintingView extends View {
         }
     }
 
-    public void setSelectedRegionColor(int colorIndex) {
+    public void setSelectedRegionColor(Colour colour) {
         if (this.currentSelectedRegion == null) {
             return;
         }
 
-        painting.colors.put(this.currentSelectedRegion, colorIndex);
+        painting.colors.put(this.currentSelectedRegion, colour);
         postInvalidate();
+    }
+
+    private int getColor(Colour colour) {
+        return Colour.chooseColour(
+            colour,
+            color1,
+            color2,
+            color3,
+            color4,
+            Color.BLACK
+        );
     }
 
     private PointF toPaintingPoint(float x, float y) {

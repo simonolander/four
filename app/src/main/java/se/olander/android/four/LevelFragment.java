@@ -37,7 +37,7 @@ public class LevelFragment extends Fragment {
         colorButton1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                painting.setSelectedRegionColor(0);
+                painting.setSelectedRegionColor(Colour.COLOUR_1);
             }
         });
         colorButton1.setBackgroundTintList(ColorStateList.valueOf(color1));
@@ -46,7 +46,7 @@ public class LevelFragment extends Fragment {
         colorButton2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                painting.setSelectedRegionColor(1);
+                painting.setSelectedRegionColor(Colour.COLOUR_2);
             }
         });
         colorButton2.setBackgroundTintList(ColorStateList.valueOf(color2));
@@ -55,7 +55,7 @@ public class LevelFragment extends Fragment {
         colorButton3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                painting.setSelectedRegionColor(2);
+                painting.setSelectedRegionColor(Colour.COLOUR_3);
             }
         });
         colorButton3.setBackgroundTintList(ColorStateList.valueOf(color3));
@@ -64,7 +64,7 @@ public class LevelFragment extends Fragment {
         colorButton4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                painting.setSelectedRegionColor(3);
+                painting.setSelectedRegionColor(Colour.COLOUR_4);
             }
         });
         colorButton4.setBackgroundTintList(ColorStateList.valueOf(color4));

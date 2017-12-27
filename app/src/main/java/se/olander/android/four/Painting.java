@@ -13,7 +13,7 @@ import java.util.Map;
 public class Painting {
 
     final ArrayList<List<Integer>> neighboursList = new ArrayList<>();
-    final Map<PaintRegion, Integer> colors = new HashMap<>();
+    final Map<PaintRegion, Colour> colors = new HashMap<>();
     final ArrayList<PaintRegion> regions = new ArrayList<>();
 
     public Painting() {
@@ -32,9 +32,9 @@ public class Painting {
         painting.regions.add(triangleRegion);
         painting.regions.add(circleRegion);
         painting.regions.add(rectangleRegion);
-        painting.colors.put(triangleRegion, 0);
+        painting.colors.put(triangleRegion, Colour.COLOUR_1);
         painting.colors.put(circleRegion, null);
-        painting.colors.put(rectangleRegion, 2);
+        painting.colors.put(rectangleRegion, Colour.COLOUR_3);
         painting.neighboursList.add(Arrays.asList(1));
         painting.neighboursList.add(Arrays.asList(0, 2));
         painting.neighboursList.add(Arrays.asList(1));
