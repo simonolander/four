@@ -256,6 +256,10 @@ public class Painting {
         }
 
         public boolean containsPoint(float x, float y) {
+            if (x < minX || x > maxX || y < minY || y > maxY) {
+                return false;
+            }
+
             float farawayX = maxX + 1000;
             float farawayY = maxY + 1000;
             boolean containsPoint = false;

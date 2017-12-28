@@ -134,6 +134,7 @@ public class PaintingView extends View {
         float scale = screenRatio > paintingRatio
             ? screenWidth / paintingWidth
             : screenHeight / paintingHeight;
+        scale *= 0.75;
 
         matrix.setTranslate(tx, ty);
         matrix.setScale(scale, scale, paintingCenterX, paintingCenterY);
