@@ -41,6 +41,7 @@ public class PaintingView extends View {
     private Matrix inverseMatrix = new Matrix();
 
     private Painting.PaintRegion currentSelectedRegion;
+    private long currentSelectedRegionTime;
 
     private OnSelectedRegionChangedListener onSelectedRegionChangedListener;
 
@@ -104,11 +105,11 @@ public class PaintingView extends View {
     }
 
     private int getCurrentSelectedRegionColor() {
-        long currentCycleTime = System.currentTimeMillis() % COLOR_ANIMATION_TIME_MILLIS;
+        long currentCycleTime = (System.currentTimeMillis() - currentSelectedRegionTime) % COLOR_ANIMATION_TIME_MILLIS;
         double t = (double) currentCycleTime / COLOR_ANIMATION_TIME_MILLIS;
         int fromColor = getColor(painting.colors.get(currentSelectedRegion), Color.WHITE);
         int toColor = Color.LTGRAY;
-        return MathUtils.interpolateRGB(fromColor, toColor, MathUtils.linearToFullSin(t));
+        return MathUtils.interpolateRGB(fromColor, toColor, MathUtils.linearToBellCos(t));
     }
 
     public void transitionToBox(float left, float top, float right, float bottom) {
@@ -224,6 +225,7 @@ public class PaintingView extends View {
 
     public void setCurrentSelectedRegion(Painting.PaintRegion currentSelectedRegion) {
         this.currentSelectedRegion = currentSelectedRegion;
+        this.currentSelectedRegionTime = System.currentTimeMillis();
 
         removeCallbacks(animateRunnable);
         if (this.currentSelectedRegion != null) {

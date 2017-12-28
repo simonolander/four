@@ -112,7 +112,6 @@ public class LevelFragment extends Fragment {
             }
         });
 
-
         return view;
     }
 

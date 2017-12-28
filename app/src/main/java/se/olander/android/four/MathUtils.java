@@ -83,6 +83,10 @@ public abstract class MathUtils {
         return (Math.sin(2*Math.PI * t) + 1) / 2;
     }
 
+    public static double linearToBellCos(double t) {
+        return 1 - (Math.cos(2*Math.PI * t) + 1) / 2;
+    }
+
     public static float cos(float rads) {
         return (float) Math.cos(rads);
     }
