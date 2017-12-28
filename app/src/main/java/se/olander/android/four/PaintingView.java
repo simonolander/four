@@ -15,7 +15,7 @@ import android.view.View;
 
 public class PaintingView extends View {
     private static final String TAG = PaintingView.class.getSimpleName();
-    private static final long COLOR_ANIMATION_TIME_MILLIS = 5000;
+    private static final long COLOR_ANIMATION_TIME_MILLIS = 2000;
     private static final long COLOR_ANIMATION_WAIT_MILLIS = 20;
 
     private final Paint
@@ -103,40 +103,10 @@ public class PaintingView extends View {
 
     private int getCurrentSelectedRegionColor() {
         long currentCycleTime = System.currentTimeMillis() % COLOR_ANIMATION_TIME_MILLIS;
-        double t;
-        int fromColor, toColor;
-        if (painting.colors.get(currentSelectedRegion) == null) {
-            long currentColorTime = currentCycleTime % (COLOR_ANIMATION_TIME_MILLIS / 4);
-            t = (double) currentColorTime / (COLOR_ANIMATION_TIME_MILLIS / 4);
-            if (currentCycleTime > COLOR_ANIMATION_TIME_MILLIS / 4 * 3) {
-                fromColor = color4;
-                toColor = color1;
-            }
-            else if (currentCycleTime > COLOR_ANIMATION_TIME_MILLIS / 2) {
-                fromColor = color3;
-                toColor = color4;
-            }
-            else if (currentCycleTime > COLOR_ANIMATION_TIME_MILLIS / 4) {
-                fromColor = color2;
-                toColor = color3;
-            }
-            else {
-                fromColor = color1;
-                toColor = color2;
-            }
-        }
-        else {
-            long currentColorTime = currentCycleTime % (COLOR_ANIMATION_TIME_MILLIS / 4);
-            t = (double) currentColorTime / (COLOR_ANIMATION_TIME_MILLIS / 4);
-            fromColor = toColor = getColor(painting.colors.get(currentSelectedRegion));
-            if (t < 0.5) {
-                toColor = Color.WHITE;
-            }
-            else {
-                fromColor = Color.WHITE;
-            }
-        }
-        return MathUtils.interpolateRGB(fromColor, toColor, t);
+        double t = (double) currentCycleTime / COLOR_ANIMATION_TIME_MILLIS;
+        int fromColor = getColor(painting.colors.get(currentSelectedRegion), Color.WHITE);
+        int toColor = Color.LTGRAY;
+        return MathUtils.interpolateRGB(fromColor, toColor, MathUtils.linearToFullSin(t));
     }
 
     @Override
@@ -219,13 +189,17 @@ public class PaintingView extends View {
     }
 
     private int getColor(Colour colour) {
+        return getColor(colour, Color.BLACK);
+    }
+
+    private int getColor(Colour colour, int defaultColor) {
         return Colour.chooseColour(
             colour,
             color1,
             color2,
             color3,
             color4,
-            Color.BLACK
+            defaultColor
         );
     }
 

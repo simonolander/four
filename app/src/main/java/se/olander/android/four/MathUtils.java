@@ -78,4 +78,8 @@ public abstract class MathUtils {
 
         return Color.argb(alpha, red, green, blue);
     }
+
+    public static double linearToFullSin(double t) {
+        return (Math.sin(2*Math.PI * t) + 1) / 2;
+    }
 }
