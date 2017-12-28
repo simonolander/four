@@ -9,6 +9,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
+
+import java.util.List;
 
 public class LevelFragment extends Fragment {
 
@@ -21,6 +25,7 @@ public class LevelFragment extends Fragment {
     private FloatingActionButton colorButton3;
     private FloatingActionButton colorButton4;
     private FloatingActionButton colorClearButton;
+    private Button doneButton;
 
     private int color1 = 0xffff867c;
     private int color2 = 0xff99d066;
@@ -90,6 +95,20 @@ public class LevelFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 painting.setSelectedRegionColor(null);
+            }
+        });
+
+        doneButton = view.findViewById(R.id.done);
+        doneButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                List<Painting.PaintRegion> someDiscoloredRegions = painting.getPainting().getSomeDiscoloredRegions();
+                if (!someDiscoloredRegions.isEmpty()) {
+                    painting.transitionToRegions(someDiscoloredRegions);
+                }
+                else {
+                    Toast.makeText(getContext(), "All done :)", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

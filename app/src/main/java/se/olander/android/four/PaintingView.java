@@ -13,6 +13,8 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
+import java.util.List;
+
 public class PaintingView extends View {
     private static final String TAG = PaintingView.class.getSimpleName();
     private static final long COLOR_ANIMATION_TIME_MILLIS = 2000;
@@ -107,6 +109,54 @@ public class PaintingView extends View {
         int fromColor = getColor(painting.colors.get(currentSelectedRegion), Color.WHITE);
         int toColor = Color.LTGRAY;
         return MathUtils.interpolateRGB(fromColor, toColor, MathUtils.linearToFullSin(t));
+    }
+
+    public void transitionToBox(float left, float top, float right, float bottom) {
+        float screenWidth = getWidth();
+        float screenHeight = getHeight();
+        float screenRatio = screenHeight / screenWidth;
+        float screenCenterX = getX() + screenWidth / 2;
+        float screenCenterY = getY() + screenHeight / 2;
+        float width = right - left;
+        float height = bottom - top;
+        float ratio = height / width;
+        float centerX = left + width / 2;
+        float centerY = top + height / 2;
+
+
+        float tx = screenCenterX - centerX;
+        float ty = screenCenterY - centerY;
+        float scale = screenRatio > ratio
+            ? screenWidth / width
+            : screenHeight / height;
+        scale *= 0.75;
+
+        matrix.reset();
+        matrix.postTranslate(tx, ty);
+        matrix.postScale(scale, scale, screenCenterX, screenCenterY);
+        postInvalidate();
+    }
+
+    public void transitionToRegions(List<Painting.PaintRegion> regions) {
+        if (regions.isEmpty()) {
+            return;
+        }
+
+        Painting.PaintRegion region = regions.get(0);
+        float left = region.base.minX;
+        float top = region.base.minY;
+        float right = region.base.maxX;
+        float bottom = region.base.maxY;
+
+        for (int i = 1; i < regions.size(); i++) {
+            region = regions.get(i);
+            left = Math.min(left, region.base.minX);
+            top = Math.min(top, region.base.minY);
+            right = Math.max(right, region.base.maxX);
+            bottom = Math.max(bottom, region.base.maxY);
+        }
+
+        transitionToBox(left, top, right, bottom);
     }
 
     @Override

@@ -6,9 +6,11 @@ import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class Painting {
 
@@ -25,6 +27,17 @@ public class Painting {
     public Painting(List<PaintRegion> regions, List<List<Integer>> neighboursList) {
         this.regions.addAll(regions);
         this.neighboursList.addAll(neighboursList);
+
+        if (neighboursList.size() != regions.size()) {
+            throw new IllegalArgumentException("Neighbours and regions have different size (" + neighboursList.size() + " != " + regions.size() + ")");
+        }
+        for (List<Integer> neighbours : neighboursList) {
+            for (Integer neighbour : neighbours) {
+                if (neighbour >= regions.size()) {
+                    throw new ArrayIndexOutOfBoundsException("Neighbour with index " + neighbour + " >= " + regions.size());
+                }
+            }
+        }
     }
 
     public static Painting somePainting() {
@@ -137,6 +150,46 @@ public class Painting {
             }
         }
         return null;
+    }
+
+    public int getRegionIndex(PaintRegion region) {
+        Objects.requireNonNull(region);
+        for (int i = 0; i < regions.size(); i++) {
+            if (region.equals(regions.get(i))) {
+                return i;
+            }
+        }
+        throw new IllegalArgumentException("Region " + region + "does not belong to painting");
+    }
+
+    public List<PaintRegion> getNeighbours(PaintRegion region) {
+        int index = getRegionIndex(region);
+        ArrayList<PaintRegion> neighbours = new ArrayList<>();
+        for (Integer neighbourIndex : neighboursList.get(index)) {
+            neighbours.add(regions.get(neighbourIndex));
+        }
+        return neighbours;
+    }
+
+    public boolean isCorrectlyColored() {
+        return !getSomeDiscoloredRegions().isEmpty();
+    }
+
+    public List<PaintRegion> getSomeDiscoloredRegions() {
+        for (PaintRegion region : regions) {
+            if (colors.get(region) == null) {
+                return Collections.singletonList(region);
+            }
+        }
+        for (PaintRegion r1 : regions) {
+            Colour colour = colors.get(r1);
+            for (PaintRegion r2 : getNeighbours(r1)) {
+                if (colors.get(r2) == colour) {
+                    return Arrays.asList(r1, r2);
+                }
+            }
+        }
+        return Collections.emptyList();
     }
 
     public float getWidth() {
