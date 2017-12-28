@@ -1,12 +1,10 @@
 package se.olander.android.four;
 
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,7 +68,7 @@ public class LevelFragment extends Fragment {
         });
         colorButton4.setBackgroundTintList(ColorStateList.valueOf(color4));
 
-        colorClearButton = view.findViewById(R.id.clear_color);
+        colorClearButton = view.findViewById(R.id.color_clear);
         colorClearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
