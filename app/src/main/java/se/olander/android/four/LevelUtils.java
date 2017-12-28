@@ -19,8 +19,8 @@ import java.util.List;
 
 class LevelUtils {
     @NonNull
-    public static List<Level> getLevels(@NonNull Context context) {
-        ArrayList<Level> levels = new ArrayList<>();
+    public static List<LevelDto> getLevels(@NonNull Context context) {
+        ArrayList<LevelDto> levels = new ArrayList<>();
         try {
             AssetManager assets = context.getAssets();
             String[] fileNames = assets.list("levels");
@@ -29,7 +29,7 @@ class LevelUtils {
                     InputStream in = assets.open("levels/" + fileName);
                     InputStreamReader reader = new InputStreamReader(in);
                     Gson gson = new Gson();
-                    Level level = gson.fromJson(reader, Level.class);
+                    LevelDto level = gson.fromJson(reader, LevelDto.class);
                     levels.add(level);
                 }
                 catch (Exception e) {

@@ -23,7 +23,7 @@ public class SelectLevelFragment extends Fragment implements AdapterView.OnItemC
         View view = inflater.inflate(R.layout.fragment_select_level, container, false);
         ListView levelListView = view.findViewById(R.id.list_levels);
 
-        List<Level> levels = LevelUtils.getLevels(getContext());
+        List<LevelDto> levels = LevelUtils.getLevels(getContext());
         LevelListAdapter levelListAdapter = new LevelListAdapter(getContext());
         levelListAdapter.addAll(levels);
         levelListView.setAdapter(levelListAdapter);
@@ -35,8 +35,8 @@ public class SelectLevelFragment extends Fragment implements AdapterView.OnItemC
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Object item = parent.getItemAtPosition(position);
-        if (item instanceof Level) {
-            Level level = (Level) item;
+        if (item instanceof LevelDto) {
+            LevelDto level = (LevelDto) item;
             getFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_container, LevelFragment.newInstance(level))

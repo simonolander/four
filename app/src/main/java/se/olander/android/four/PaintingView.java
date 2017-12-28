@@ -136,8 +136,9 @@ public class PaintingView extends View {
             : screenHeight / paintingHeight;
         scale *= 0.75;
 
-        matrix.setTranslate(tx, ty);
-        matrix.setScale(scale, scale, paintingCenterX, paintingCenterY);
+        matrix.reset();
+        matrix.postTranslate(tx, ty);
+        matrix.postScale(scale, scale, screenCenterX, screenCenterY);
         minScale = scale;
         maxScale = scale * 4;
     }

@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-class LevelListAdapter extends ArrayAdapter<Level> {
+class LevelListAdapter extends ArrayAdapter<LevelDto> {
     public LevelListAdapter(@NonNull Context context) {
         super(context, 0);
     }
@@ -22,7 +22,10 @@ class LevelListAdapter extends ArrayAdapter<Level> {
         }
 
         TextView title = view.findViewById(R.id.title);
-        title.setText(getItem(position).toString());
+        LevelDto level = getItem(position);
+        if (level != null) {
+            title.setText(level.name);
+        }
 
         return view;
     }

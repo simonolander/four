@@ -2,15 +2,17 @@ package se.olander.android.four;
 
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 public class LevelFragment extends Fragment {
+
+    private static final String LEVEL_KEY = "LEVEL_KEY";
 
     private static final String TAG = LevelFragment.class.getSimpleName();
 
@@ -25,19 +27,26 @@ public class LevelFragment extends Fragment {
     private int color3 = 0xfffff263;
     private int color4 = 0xff5eb8ff;
 
+    private LevelDto level;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Bundle args = getArguments();
+        if (args == null) {
+            throw new IllegalArgumentException("Arguments can not be null, use " + TAG + ".newInstance(LevelDto)");
+        }
+        this.level = (LevelDto) args.getSerializable(LEVEL_KEY);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_level, container, false);
 
         final PaintingView painting = view.findViewById(R.id.painting);
-        painting.setPainting(Painting.outcastLevel2());
-        Log.d(TAG, "onCreateView: " + LevelUtils.getLevels(getContext()));
-
-        for (Painting.PaintRegion region : painting.getPainting().regions) {
-            Log.d(TAG, "onCreateView: " + region.base);
-        }
-
+        painting.setPainting(level.getPainting());
         painting.setColors(color1, color2, color3, color4);
 
         colorButton1 = view.findViewById(R.id.color_1);
@@ -88,7 +97,11 @@ public class LevelFragment extends Fragment {
         return view;
     }
 
-    public static Fragment newInstance(Level level) {
-        return new LevelFragment();
+    public static Fragment newInstance(@NonNull LevelDto level) {
+        Bundle args = new Bundle();
+        args.putSerializable(LEVEL_KEY, level);
+        LevelFragment fragment = new LevelFragment();
+        fragment.setArguments(args);
+        return fragment;
     }
 }

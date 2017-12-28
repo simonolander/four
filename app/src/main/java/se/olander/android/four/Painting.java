@@ -22,6 +22,11 @@ public class Painting {
 
     }
 
+    public Painting(List<PaintRegion> regions, List<List<Integer>> neighboursList) {
+        this.regions.addAll(regions);
+        this.neighboursList.addAll(neighboursList);
+    }
+
     public static Painting somePainting() {
         Painting painting = new Painting();
         float cx = 500, cy = 900;
