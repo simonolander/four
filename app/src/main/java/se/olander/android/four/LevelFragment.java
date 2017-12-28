@@ -50,15 +50,15 @@ public class LevelFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_level, container, false);
 
-        final PaintingView painting = view.findViewById(R.id.painting);
-        painting.setPainting(level.getPainting());
-        painting.setColors(color1, color2, color3, color4);
+        final PaintingView paintingView = view.findViewById(R.id.painting);
+        paintingView.setPainting(level.getPainting());
+        paintingView.setColors(color1, color2, color3, color4);
 
         colorButton1 = view.findViewById(R.id.color_1);
         colorButton1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                painting.setSelectedRegionColor(Colour.COLOUR_1);
+                paintingView.setSelectedRegionColor(Colour.COLOUR_1);
             }
         });
         colorButton1.setBackgroundTintList(ColorStateList.valueOf(color1));
@@ -67,7 +67,7 @@ public class LevelFragment extends Fragment {
         colorButton2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                painting.setSelectedRegionColor(Colour.COLOUR_2);
+                paintingView.setSelectedRegionColor(Colour.COLOUR_2);
             }
         });
         colorButton2.setBackgroundTintList(ColorStateList.valueOf(color2));
@@ -76,7 +76,7 @@ public class LevelFragment extends Fragment {
         colorButton3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                painting.setSelectedRegionColor(Colour.COLOUR_3);
+                paintingView.setSelectedRegionColor(Colour.COLOUR_3);
             }
         });
         colorButton3.setBackgroundTintList(ColorStateList.valueOf(color3));
@@ -85,7 +85,7 @@ public class LevelFragment extends Fragment {
         colorButton4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                painting.setSelectedRegionColor(Colour.COLOUR_4);
+                paintingView.setSelectedRegionColor(Colour.COLOUR_4);
             }
         });
         colorButton4.setBackgroundTintList(ColorStateList.valueOf(color4));
@@ -94,7 +94,7 @@ public class LevelFragment extends Fragment {
         colorClearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                painting.setSelectedRegionColor(null);
+                paintingView.setSelectedRegionColor(null);
             }
         });
 
@@ -102,9 +102,9 @@ public class LevelFragment extends Fragment {
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                List<Painting.PaintRegion> someDiscoloredRegions = painting.getPainting().getSomeDiscoloredRegions();
+                List<Painting.PaintRegion> someDiscoloredRegions = paintingView.getPainting().getSomeDiscoloredRegions();
                 if (!someDiscoloredRegions.isEmpty()) {
-                    painting.transitionToRegions(someDiscoloredRegions);
+                    paintingView.transitionToRegions(someDiscoloredRegions);
                 }
                 else {
                     Toast.makeText(getContext(), "All done :)", Toast.LENGTH_SHORT).show();
