@@ -17,6 +17,7 @@ public class LevelFragment extends Fragment {
     private FloatingActionButton colorButton2;
     private FloatingActionButton colorButton3;
     private FloatingActionButton colorButton4;
+    private FloatingActionButton colorClearButton;
 
     private int color1 = 0xffff867c;
     private int color2 = 0xff99d066;
@@ -68,6 +69,14 @@ public class LevelFragment extends Fragment {
             }
         });
         colorButton4.setBackgroundTintList(ColorStateList.valueOf(color4));
+
+        colorClearButton = view.findViewById(R.id.clear_color);
+        colorClearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                painting.setSelectedRegionColor(null);
+            }
+        });
 
 
         return view;

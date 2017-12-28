@@ -51,6 +51,18 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"/>
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/clear_color"
+            android:src="@drawable/ic_format_color_reset_black_24dp"
+            android:tint="@android:color/darker_gray"
+            android:backgroundTint="@android:color/background_light"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"/>
+
     </LinearLayout>
 
 
