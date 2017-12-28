@@ -28,7 +28,7 @@ public class LevelFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_level, container, false);
 
         final PaintingView painting = view.findViewById(R.id.painting);
-        painting.setPainting(Painting.somePainting());
+        painting.setPainting(Painting.outcastLevel1());
 
         painting.setColors(color1, color2, color3, color4);
 

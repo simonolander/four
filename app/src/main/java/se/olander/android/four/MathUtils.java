@@ -82,4 +82,8 @@ public abstract class MathUtils {
     public static double linearToFullSin(double t) {
         return (Math.sin(2*Math.PI * t) + 1) / 2;
     }
+
+    public static float cos(float rads) {
+        return (float) Math.cos(rads);
+    }
 }

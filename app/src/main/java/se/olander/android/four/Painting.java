@@ -2,6 +2,7 @@ package se.olander.android.four;
 
 import android.graphics.Path;
 import android.graphics.PointF;
+import android.graphics.Region;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
@@ -11,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Painting {
+
+    private static final double TAU = 2 * Math.PI;
 
     final ArrayList<List<Integer>> neighboursList = new ArrayList<>();
     final Map<PaintRegion, Colour> colors = new HashMap<>();
@@ -38,6 +41,43 @@ public class Painting {
         painting.neighboursList.add(Arrays.asList(1));
         painting.neighboursList.add(Arrays.asList(0, 2));
         painting.neighboursList.add(Arrays.asList(1));
+        return painting;
+    }
+
+    public static Painting outcastLevel1() {
+        Painting painting = new Painting();
+        float radius = 500;
+        Polygon center = Polygon.triangle(radius);
+        Polygon ne = new Polygon(Arrays.asList(
+            new PointF((float) Math.cos(0) * radius, (float) Math.sin(0) * radius),
+            new PointF((float) Math.cos(TAU / 3) * radius, (float) Math.sin(TAU / 3) * radius),
+            new PointF((float) Math.cos(TAU / 3) * 2 * radius, (float) Math.sin(TAU / 3) * 2 * radius),
+            new PointF((float) Math.cos(0) * 2 * radius, (float) Math.sin(0) * 2 * radius)
+        ));
+        Polygon se = new Polygon(Arrays.asList(
+            new PointF((float) Math.cos(0) * radius, (float) Math.sin(0) * radius),
+            new PointF((float) Math.cos(0) * 2 * radius, (float) Math.sin(0) * 2 * radius),
+            new PointF((float) Math.cos(TAU * 2 / 3) * 2 * radius, (float) Math.sin(TAU * 2 / 3) * 2 * radius),
+            new PointF((float) Math.cos(TAU * 2 / 3) * radius, (float) Math.sin(TAU * 2 / 3) * radius)
+        ));
+        Polygon w = new Polygon(Arrays.asList(
+            new PointF((float) Math.cos(TAU * 2 / 3) * radius, (float) Math.sin(TAU * 2 / 3) * radius),
+            new PointF((float) Math.cos(TAU * 2 / 3) * 2 * radius, (float) Math.sin(TAU * 2 / 3) * 2 * radius),
+            new PointF((float) Math.cos(TAU / 3) * 2 * radius, (float) Math.sin(TAU / 3) * 2 * radius),
+            new PointF((float) Math.cos(TAU / 3) * radius, (float) Math.sin(TAU / 3) * radius)
+        ));
+        PaintRegion centerRegion = new PaintRegion(center);
+        PaintRegion neRegion = new PaintRegion(ne);
+        PaintRegion seRegion = new PaintRegion(se);
+        PaintRegion wRegion = new PaintRegion(w);
+        painting.regions.add(centerRegion);
+        painting.regions.add(neRegion);
+        painting.regions.add(seRegion);
+        painting.regions.add(wRegion);
+        painting.neighboursList.add(Arrays.asList(1, 2, 3));
+        painting.neighboursList.add(Arrays.asList(0, 2, 3));
+        painting.neighboursList.add(Arrays.asList(0, 1, 3));
+        painting.neighboursList.add(Arrays.asList(0, 1, 2));
         return painting;
     }
 
@@ -116,11 +156,11 @@ public class Painting {
     }
 
     public static class Polygon {
-        final ArrayList<PointF> points;
+        final List<PointF> points;
         final float minX, maxX, minY, maxY;
         final Path path;
 
-        public Polygon(ArrayList<PointF> points) {
+        public Polygon(List<PointF> points) {
             if (points.isEmpty()) throw new IllegalArgumentException();
 
             this.points = points;
@@ -198,6 +238,10 @@ public class Painting {
             points.add(new PointF(cx + rx, cy + ry));
             points.add(new PointF(cx - rx, cy + ry));
             return new Polygon(points);
+        }
+
+        public static Polygon triangle(float r) {
+            return circle(0, 0, r, 3);
         }
 
         public static Polygon triangle(float cx, float cy, float r) {
