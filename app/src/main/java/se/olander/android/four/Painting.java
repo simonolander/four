@@ -2,7 +2,6 @@ package se.olander.android.four;
 
 import android.graphics.Path;
 import android.graphics.PointF;
-import android.graphics.Region;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
@@ -81,6 +80,50 @@ public class Painting {
         return painting;
     }
 
+    public static Painting outcastLevel2() {
+        float radius = 250;
+        PointF nw1 = new PointF(-radius, -radius);
+        PointF ne1 = new PointF(radius, -radius);
+        PointF se1 = new PointF(radius, radius);
+        PointF sw1 = new PointF(-radius, radius);
+        PointF w1 = new PointF(-radius, 0);
+        PointF n1 = new PointF(0, -radius);
+        PointF e1 = new PointF(radius, 0);
+        PointF s1 = new PointF(0, radius);
+        PointF nw2 = new PointF(-radius * 2, -radius * 2);
+        PointF ne2 = new PointF(radius * 2, -radius * 2);
+        PointF se2 = new PointF(radius * 2, radius * 2);
+        PointF sw2 = new PointF(-radius * 2, radius * 2);
+        PointF w2 = new PointF(-radius * 2, 0);
+        PointF n2 = new PointF(0, -radius * 2);
+        PointF e2 = new PointF(radius * 2, 0);
+        PointF s2 = new PointF(0, radius * 2);
+        PointF nw3 = new PointF(-radius * 3, -radius * 3);
+        PointF ne3 = new PointF(radius * 3, -radius * 3);
+        PointF se3 = new PointF(radius * 3, radius * 3);
+        PointF sw3 = new PointF(-radius * 3, radius * 3);
+        PaintRegion center = new PaintRegion(new Polygon(nw1, ne1, se1, sw1));
+        PaintRegion nw = new PaintRegion(new Polygon(nw2, n2, n1, nw1, w1, w2));
+        PaintRegion ne = new PaintRegion(new Polygon(n1, n2, ne2, e2, e1, ne1));
+        PaintRegion se = new PaintRegion(new Polygon(e1, e2, se2, s2, s1, se1));
+        PaintRegion sw = new PaintRegion(
+            new Polygon(sw3, nw3, ne3, se3),
+            new Polygon(sw1, w1, w2, nw2, ne2, se2, s2, s1)
+        );
+        Painting painting = new Painting();
+        painting.regions.add(center);
+        painting.regions.add(nw);
+        painting.regions.add(ne);
+        painting.regions.add(se);
+        painting.regions.add(sw);
+        painting.neighboursList.add(Arrays.asList(1, 2, 3, 4));
+        painting.neighboursList.add(Arrays.asList(0, 2, 4));
+        painting.neighboursList.add(Arrays.asList(0, 1, 3, 4));
+        painting.neighboursList.add(Arrays.asList(0, 2, 4));
+        painting.neighboursList.add(Arrays.asList(0, 1, 2, 3));
+        return painting;
+    }
+
     @Nullable
     public PaintRegion getRegion(PointF point) {
         for (PaintRegion region : regions) {
@@ -153,6 +196,14 @@ public class Painting {
                 return false;
             }
         }
+
+        @Override
+        public String toString() {
+            return "PaintRegion{" +
+                "base=" + base +
+                ", holes=" + holes +
+                '}' ;
+        }
     }
 
     public static class Polygon {
@@ -200,6 +251,10 @@ public class Painting {
             this.path.close();
         }
 
+        public Polygon(PointF... points) {
+            this(Arrays.asList(points));
+        }
+
         public boolean containsPoint(float x, float y) {
             float farawayX = maxX + 1000;
             float farawayY = maxY + 1000;
@@ -214,6 +269,13 @@ public class Painting {
             }
 
             return containsPoint;
+        }
+
+        @Override
+        public String toString() {
+            return "Polygon{" +
+                "points=" + points +
+                '}' ;
         }
 
         public static Polygon circle(float cx, float cy, float r) {

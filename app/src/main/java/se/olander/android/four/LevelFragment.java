@@ -5,11 +5,14 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 public class LevelFragment extends Fragment {
+
+    private static final String TAG = LevelFragment.class.getSimpleName();
 
     private FloatingActionButton colorButton1;
     private FloatingActionButton colorButton2;
@@ -28,7 +31,12 @@ public class LevelFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_level, container, false);
 
         final PaintingView painting = view.findViewById(R.id.painting);
-        painting.setPainting(Painting.outcastLevel1());
+        painting.setPainting(Painting.outcastLevel2());
+        Log.d(TAG, "onCreateView: " + LevelUtils.getLevels(getContext()));
+
+        for (Painting.PaintRegion region : painting.getPainting().regions) {
+            Log.d(TAG, "onCreateView: " + region.base);
+        }
 
         painting.setColors(color1, color2, color3, color4);
 
