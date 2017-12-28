@@ -3,6 +3,7 @@ package se.olander.android.four;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 
@@ -41,5 +42,19 @@ class LevelUtils {
         }
         Collections.sort(levels);
         return levels;
+    }
+
+    @Nullable
+    public static LevelDto getNextLevel(@NonNull Context context, LevelDto level) {
+        boolean next = false;
+        for (LevelDto lvl : getLevels(context)) {
+            if (next) {
+                return lvl;
+            }
+            if (lvl.equals(level)) {
+                next = true;
+            }
+        }
+        return null;
     }
 }

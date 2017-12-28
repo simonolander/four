@@ -44,6 +44,10 @@ public class SelectLevelFragment extends Fragment implements AdapterView.OnItemC
                 .commit();
         }
     }
+
+    public static SelectLevelFragment newInstance() {
+        return new SelectLevelFragment();
+    }
 }
 
 

@@ -46,6 +46,24 @@ public class LevelDto implements Comparable<LevelDto>, Serializable {
             '}' ;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        LevelDto levelDto = (LevelDto) o;
+
+        if (ordinal != levelDto.ordinal) return false;
+        return name != null ? name.equals(levelDto.name) : levelDto.name == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = ordinal;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
+    }
+
     public class PaintRegionDto implements Serializable {
         PolygonDto base;
         PolygonDto[] holes;
