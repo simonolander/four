@@ -46,12 +46,12 @@ public class LevelDto implements Comparable<LevelDto>, Serializable {
             '}' ;
     }
 
-    public class PaintRegionDto {
+    public class PaintRegionDto implements Serializable {
         PolygonDto base;
         PolygonDto[] holes;
     }
 
-    public class PolygonDto {
+    public class PolygonDto implements Serializable {
         List<PointF> points;
     }
 }

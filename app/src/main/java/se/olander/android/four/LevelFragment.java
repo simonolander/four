@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,8 @@ public class LevelFragment extends Fragment {
 
     private LevelDto level;
 
+    private long timeStart;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,12 +45,13 @@ public class LevelFragment extends Fragment {
         if (args == null) {
             throw new IllegalArgumentException("Arguments can not be null, use " + TAG + ".newInstance(LevelDto)");
         }
-        this.level = (LevelDto) args.getSerializable(LEVEL_KEY);
+        level = (LevelDto) args.getSerializable(LEVEL_KEY);
+        timeStart = System.currentTimeMillis();
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_level, container, false);
 
         final PaintingView paintingView = view.findViewById(R.id.painting);
@@ -103,16 +107,27 @@ public class LevelFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 List<Painting.PaintRegion> someDiscoloredRegions = paintingView.getPainting().getSomeDiscoloredRegions();
-                if (!someDiscoloredRegions.isEmpty()) {
+                if (someDiscoloredRegions.isEmpty()) {
+                    victory();
+                } else {
                     paintingView.transitionToRegions(someDiscoloredRegions);
-                }
-                else {
-                    Toast.makeText(getContext(), "All done :)", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
         return view;
+    }
+
+    private void victory() {
+        Toast.makeText(getContext(), "All done :)", Toast.LENGTH_SHORT).show();
+        FragmentManager manager = getFragmentManager();
+        assert manager != null;
+        manager.popBackStack();
+        manager
+            .beginTransaction()
+            .replace(R.id.fragment_container, VictoryScreenFragment.newInstance(level, System.currentTimeMillis() - timeStart))
+            .addToBackStack(null)
+            .commit();
     }
 
     public static Fragment newInstance(@NonNull LevelDto level) {
