@@ -77,7 +77,7 @@ public class PaintingView extends View {
             if (region == currentSelectedRegion) {
                 fillRegion(canvas, region, getCurrentSelectedRegionColor());
             }
-            else if (painting.colors.get(region) != null) {
+            else {
                 fillRegion(canvas, region, getColor(painting.colors.get(region)));
             }
         }
@@ -191,7 +191,7 @@ public class PaintingView extends View {
     }
 
     private int getColor(Colour colour) {
-        return getColor(colour, Color.BLACK);
+        return getColor(colour, Color.WHITE);
     }
 
     private int getColor(Colour colour, int defaultColor) {
