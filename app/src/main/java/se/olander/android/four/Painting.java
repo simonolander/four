@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,7 @@ public class Painting {
 
     private static final double TAU = 2 * Math.PI;
 
-    final ArrayList<List<Integer>> neighboursList = new ArrayList<>();
+    final Map<PaintRegion, List<PaintRegion>> neighboursList = new HashMap<>();
     final Map<PaintRegion, Colour> colors = new HashMap<>();
     final ArrayList<PaintRegion> regions = new ArrayList<>();
 
@@ -25,8 +26,20 @@ public class Painting {
     }
 
     public Painting(List<PaintRegion> regions, List<List<Integer>> neighboursList) {
+        for (int i = 0; i < neighboursList.size(); i++) {
+            ArrayList<PaintRegion> neighbours = new ArrayList<>();
+            for (Integer integer : neighboursList.get(i)) {
+                neighbours.add(regions.get(integer));
+            }
+            this.neighboursList.put(regions.get(i), neighbours);
+        }
+        Collections.sort(regions, new Comparator<PaintRegion>() {
+            @Override
+            public int compare(PaintRegion r1, PaintRegion r2) {
+                return Float.compare(r2.base.area, r1.base.area);
+            }
+        });
         this.regions.addAll(regions);
-        this.neighboursList.addAll(neighboursList);
 
         if (neighboursList.size() != regions.size()) {
             throw new IllegalArgumentException("Neighbours and regions have different size (" + neighboursList.size() + " != " + regions.size() + ")");
@@ -38,108 +51,6 @@ public class Painting {
                 }
             }
         }
-    }
-
-    public static Painting somePainting() {
-        Painting painting = new Painting();
-        float cx = 500, cy = 900;
-        Polygon triangle = Polygon.triangle(cx, cy, 50);
-        Polygon circle = Polygon.circle(cx, cy, 150);
-        Polygon rectangle = Polygon.rectangle(cx, cy, cx, cy);
-        PaintRegion triangleRegion = new PaintRegion(triangle);
-        PaintRegion circleRegion = new PaintRegion(circle, triangle);
-        PaintRegion rectangleRegion = new PaintRegion(rectangle, circle);
-        painting.regions.add(triangleRegion);
-        painting.regions.add(circleRegion);
-        painting.regions.add(rectangleRegion);
-        painting.colors.put(triangleRegion, Colour.COLOUR_1);
-        painting.colors.put(circleRegion, null);
-        painting.colors.put(rectangleRegion, Colour.COLOUR_3);
-        painting.neighboursList.add(Arrays.asList(1));
-        painting.neighboursList.add(Arrays.asList(0, 2));
-        painting.neighboursList.add(Arrays.asList(1));
-        return painting;
-    }
-
-    public static Painting outcastLevel1() {
-        Painting painting = new Painting();
-        float radius = 500;
-        Polygon center = Polygon.triangle(radius);
-        Polygon ne = new Polygon(Arrays.asList(
-            new PointF((float) Math.cos(0) * radius, (float) Math.sin(0) * radius),
-            new PointF((float) Math.cos(TAU / 3) * radius, (float) Math.sin(TAU / 3) * radius),
-            new PointF((float) Math.cos(TAU / 3) * 2 * radius, (float) Math.sin(TAU / 3) * 2 * radius),
-            new PointF((float) Math.cos(0) * 2 * radius, (float) Math.sin(0) * 2 * radius)
-        ));
-        Polygon se = new Polygon(Arrays.asList(
-            new PointF((float) Math.cos(0) * radius, (float) Math.sin(0) * radius),
-            new PointF((float) Math.cos(0) * 2 * radius, (float) Math.sin(0) * 2 * radius),
-            new PointF((float) Math.cos(TAU * 2 / 3) * 2 * radius, (float) Math.sin(TAU * 2 / 3) * 2 * radius),
-            new PointF((float) Math.cos(TAU * 2 / 3) * radius, (float) Math.sin(TAU * 2 / 3) * radius)
-        ));
-        Polygon w = new Polygon(Arrays.asList(
-            new PointF((float) Math.cos(TAU * 2 / 3) * radius, (float) Math.sin(TAU * 2 / 3) * radius),
-            new PointF((float) Math.cos(TAU * 2 / 3) * 2 * radius, (float) Math.sin(TAU * 2 / 3) * 2 * radius),
-            new PointF((float) Math.cos(TAU / 3) * 2 * radius, (float) Math.sin(TAU / 3) * 2 * radius),
-            new PointF((float) Math.cos(TAU / 3) * radius, (float) Math.sin(TAU / 3) * radius)
-        ));
-        PaintRegion centerRegion = new PaintRegion(center);
-        PaintRegion neRegion = new PaintRegion(ne);
-        PaintRegion seRegion = new PaintRegion(se);
-        PaintRegion wRegion = new PaintRegion(w);
-        painting.regions.add(centerRegion);
-        painting.regions.add(neRegion);
-        painting.regions.add(seRegion);
-        painting.regions.add(wRegion);
-        painting.neighboursList.add(Arrays.asList(1, 2, 3));
-        painting.neighboursList.add(Arrays.asList(0, 2, 3));
-        painting.neighboursList.add(Arrays.asList(0, 1, 3));
-        painting.neighboursList.add(Arrays.asList(0, 1, 2));
-        return painting;
-    }
-
-    public static Painting outcastLevel2() {
-        float radius = 250;
-        PointF nw1 = new PointF(-radius, -radius);
-        PointF ne1 = new PointF(radius, -radius);
-        PointF se1 = new PointF(radius, radius);
-        PointF sw1 = new PointF(-radius, radius);
-        PointF w1 = new PointF(-radius, 0);
-        PointF n1 = new PointF(0, -radius);
-        PointF e1 = new PointF(radius, 0);
-        PointF s1 = new PointF(0, radius);
-        PointF nw2 = new PointF(-radius * 2, -radius * 2);
-        PointF ne2 = new PointF(radius * 2, -radius * 2);
-        PointF se2 = new PointF(radius * 2, radius * 2);
-        PointF sw2 = new PointF(-radius * 2, radius * 2);
-        PointF w2 = new PointF(-radius * 2, 0);
-        PointF n2 = new PointF(0, -radius * 2);
-        PointF e2 = new PointF(radius * 2, 0);
-        PointF s2 = new PointF(0, radius * 2);
-        PointF nw3 = new PointF(-radius * 3, -radius * 3);
-        PointF ne3 = new PointF(radius * 3, -radius * 3);
-        PointF se3 = new PointF(radius * 3, radius * 3);
-        PointF sw3 = new PointF(-radius * 3, radius * 3);
-        PaintRegion center = new PaintRegion(new Polygon(nw1, ne1, se1, sw1));
-        PaintRegion nw = new PaintRegion(new Polygon(nw2, n2, n1, nw1, w1, w2));
-        PaintRegion ne = new PaintRegion(new Polygon(n1, n2, ne2, e2, e1, ne1));
-        PaintRegion se = new PaintRegion(new Polygon(e1, e2, se2, s2, s1, se1));
-        PaintRegion sw = new PaintRegion(
-            new Polygon(sw3, nw3, ne3, se3),
-            new Polygon(sw1, w1, w2, nw2, ne2, se2, s2, s1)
-        );
-        Painting painting = new Painting();
-        painting.regions.add(center);
-        painting.regions.add(nw);
-        painting.regions.add(ne);
-        painting.regions.add(se);
-        painting.regions.add(sw);
-        painting.neighboursList.add(Arrays.asList(1, 2, 3, 4));
-        painting.neighboursList.add(Arrays.asList(0, 2, 4));
-        painting.neighboursList.add(Arrays.asList(0, 1, 3, 4));
-        painting.neighboursList.add(Arrays.asList(0, 2, 4));
-        painting.neighboursList.add(Arrays.asList(0, 1, 2, 3));
-        return painting;
     }
 
     @Nullable
@@ -163,12 +74,7 @@ public class Painting {
     }
 
     public List<PaintRegion> getNeighbours(PaintRegion region) {
-        int index = getRegionIndex(region);
-        ArrayList<PaintRegion> neighbours = new ArrayList<>();
-        for (Integer neighbourIndex : neighboursList.get(index)) {
-            neighbours.add(regions.get(neighbourIndex));
-        }
-        return neighbours;
+        return neighboursList.get(region);
     }
 
     public boolean isCorrectlyColored() {
@@ -268,6 +174,7 @@ public class Painting {
         final List<PointF> points;
         final float minX, maxX, minY, maxY;
         final Path path;
+        final float area;
 
         public Polygon(List<PointF> points) {
             if (points.isEmpty()) throw new IllegalArgumentException();
@@ -307,6 +214,14 @@ public class Painting {
                 }
             }
             this.path.close();
+
+            float area = 0;
+            for (int i = 0; i < points.size(); i++) {
+                PointF p1 = points.get(i), p2 = points.get((i + 1) % points.size());
+                area += p1.x * p2.y - p2.x * p1.y;
+            }
+            area = Math.abs(area / 2);
+            this.area = area;
         }
 
         public Polygon(PointF... points) {

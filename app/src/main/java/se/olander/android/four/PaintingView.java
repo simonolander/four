@@ -92,9 +92,6 @@ public class PaintingView extends View {
     private void fillRegion(Canvas canvas, Painting.PaintRegion region, int color) {
         canvas.save();
         canvas.clipPath(region.base.path);
-        for (Painting.Polygon hole : region.holes) {
-            canvas.clipOutPath(hole.path);
-        }
         fillPaint.setColor(color);
         canvas.drawPath(region.base.path, fillPaint);
         canvas.restore();
