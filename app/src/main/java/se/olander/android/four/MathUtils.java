@@ -1,6 +1,8 @@
 package se.olander.android.four;
 
 import android.graphics.Color;
+import android.graphics.PointF;
+import android.support.annotation.Nullable;
 
 public abstract class MathUtils {
 
@@ -60,6 +62,30 @@ public abstract class MathUtils {
         return (AvB * AvC <= 0.0) && (BvC * (AvB + BvC - AvC) <= 0.0);
     }
 
+    @Nullable
+    public static PointF getIntersectionPoint(PointF p11, PointF p12, PointF p21, PointF p22) {
+        return getIntersectionPoint(p11.x, p11.y, p12.x, p12.y, p21.x, p21.y, p22.x, p22.y);
+    }
+
+    @Nullable
+    public static PointF getIntersectionPoint(
+        float x1,
+        float y1,
+        float x2,
+        float y2,
+        float x3,
+        float y3,
+        float x4,
+        float y4
+    ) {
+        if (!linesIntersect(x1, y1, x2, y2, x3, y3, x4, y4)) {
+            return null;
+        }
+
+        float t = cross(x3 - x1, y3 - y1, x4 - x3, y4 - y3) / cross(x2 - x1, y2 - y1, x4 - x3, y4 - y3);
+        return new PointF(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
+    }
+
     public static int interpolateRGB(int from, int to, double t) {
         int fromAlpha = Color.alpha(from);
         int fromRed = Color.red(from);
@@ -89,5 +115,9 @@ public abstract class MathUtils {
 
     public static float cos(float rads) {
         return (float) Math.cos(rads);
+    }
+
+    public static float cross(float x1, float y1, float x2, float y2) {
+        return x1 * y2 - x2 * y1;
     }
 }

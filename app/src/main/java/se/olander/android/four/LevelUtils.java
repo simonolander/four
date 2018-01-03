@@ -2,6 +2,7 @@ package se.olander.android.four;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.graphics.PointF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -56,5 +57,12 @@ class LevelUtils {
             }
         }
         return null;
+    }
+
+    void createLevel(List<PointF> points) {
+        PointF p1 = new PointF(0, 0);
+        PointF p2 = new PointF(500, 0);
+        PointF p3 = new PointF(500, 500);
+        PointF p4 = new PointF(0, 500);
     }
 }
