@@ -1,6 +1,7 @@
 package se.olander.android.four;
 
 import android.graphics.PointF;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,6 +17,8 @@ import java.util.Random;
 import java.util.Set;
 
 public class Graph {
+
+    private static final String TAG = Graph.class.getSimpleName();
 
     private List<Node> nodes;
     private Map<Node, List<Node>> neighboursMap;
@@ -310,7 +313,7 @@ public class Graph {
         visited[0][0] = true;
         dfsMaze(faceGraph, width, height, 0, 0, visited, random);
 
-        for (int i = 0; i < 40;) {
+        for (int i = 0; i < 0;) {
             int x = random.nextInt(width - 1);
             int y = random.nextInt(height);
             int n1 = y * width + x;
@@ -365,10 +368,14 @@ public class Graph {
             nexts.add(new Coord(x, y + 1));
         }
         Collections.shuffle(nexts, random);
+        boolean branched = false;
         for (Coord next : nexts) {
             if (!visited[next.x][next.y]) {
                 int n2 = next.y * width + next.x;
-                graph.connect(n1, n2);
+                if (!branched) {
+                    graph.connect(n1, n2);
+                    branched = true;
+                }
                 visited[next.x][next.y] = true;
                 dfsMaze(graph, width, height, next.x, next.y, visited, random);
             }
@@ -376,8 +383,8 @@ public class Graph {
     }
 
     private static void printWallGraph(Graph g, int w, int h) {
-
         StringBuilder builder = new StringBuilder();
+        builder.append('\n');
         for (int n = 0; n < w - 1; n++) {
             builder.append('·');
             if (g.areNeighbours(n, n + 1)) {
@@ -414,7 +421,7 @@ public class Graph {
             builder.append('·');
             builder.append('\n');
         }
-        System.out.println(builder.toString());
+        Log.d(TAG, "printWallGraph: " + builder.toString());
     }
 
     public static class Coord {
