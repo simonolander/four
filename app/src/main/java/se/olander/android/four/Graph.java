@@ -296,9 +296,7 @@ public class Graph {
         return graph;
     }
 
-    public static Graph bfsMazeGraph() {
-        int width = 20;
-        int height = 20;
+    public static Graph bfsMazeGraph(int width, int height, int seed) {
         int size = 100;
 
         Graph faceGraph = new Graph();
@@ -308,21 +306,10 @@ public class Graph {
             }
         }
 
-        Random random = new Random();
+        Random random = new Random(seed);
         boolean[][] visited = new boolean[width][height];
         visited[0][0] = true;
-        dfsMaze(faceGraph, width, height, 0, 0, visited, random);
-
-        for (int i = 0; i < 0;) {
-            int x = random.nextInt(width - 1);
-            int y = random.nextInt(height);
-            int n1 = y * width + x;
-            int n2 = n1 + 1;
-            if (faceGraph.areNeighbours(n1, n2)) {
-                faceGraph.disconnect(n1, n2);
-                i += 1;
-            }
-        }
+        dfsMaze(faceGraph, width, height, new Coord(0, 0), visited, random, new HashSet<Coord>());
 
         Graph wallGraph = square(width + 1, height + 1, size);
         for (int i = 0; i < faceGraph.nodes.size(); i++) {
@@ -352,34 +339,52 @@ public class Graph {
         return wallGraph;
     }
 
-    private static void dfsMaze(Graph graph, int width, int height, int x, int y, boolean[][] visited, Random random) {
-        int n1 = y * width + x;
-        List<Coord> nexts = new ArrayList<>();
-        if (x > 0) {
-            nexts.add(new Coord(x - 1, y));
-        }
-        if (x < width - 1) {
-            nexts.add(new Coord(x + 1, y));
-        }
-        if (y > 0) {
-            nexts.add(new Coord(x, y - 1));
-        }
-        if (y < height - 1) {
-            nexts.add(new Coord(x, y + 1));
-        }
+    private static void dfsMaze(Graph graph, int width, int height, Coord current, boolean[][] visited, Random random, Set<Coord> currentRoom) {
+        currentRoom.add(current);
+        int n1 = current.y * width + current.x;
+        List<Coord> nexts = mazeNeighbours(current, width, height);
         Collections.shuffle(nexts, random);
         boolean branched = false;
         for (Coord next : nexts) {
-            if (!visited[next.x][next.y]) {
-                int n2 = next.y * width + next.x;
-                if (!branched) {
-                    graph.connect(n1, n2);
-                    branched = true;
-                }
-                visited[next.x][next.y] = true;
-                dfsMaze(graph, width, height, next.x, next.y, visited, random);
+            if (visited[next.x][next.y]) {
+                continue;
             }
+            boolean skip = false;
+            for (Coord neighbour : mazeNeighbours(next, width, height)) {
+                if (!neighbour.equals(current) && currentRoom.contains(neighbour)) {
+                    skip = true;
+                }
+            }
+            if (skip) {
+                continue;
+            }
+
+            int n2 = next.y * width + next.x;
+            if (!branched) {
+                graph.connect(n1, n2);
+            }
+            visited[next.x][next.y] = true;
+            dfsMaze(graph, width, height, next, visited, random, branched ? new HashSet<Coord>() : currentRoom);
+            branched = true;
         }
+    }
+
+    private static List<Coord> mazeNeighbours(Coord c, int width, int height) {
+        List<Coord> neighbours = new ArrayList<>();
+        if (c.x > 0) {
+            neighbours.add(new Coord(c.x - 1, c.y));
+        }
+        if (c.x < width - 1) {
+            neighbours.add(new Coord(c.x + 1, c.y));
+        }
+        if (c.y > 0) {
+            neighbours.add(new Coord(c.x, c.y - 1));
+        }
+        if (c.y < height - 1) {
+            neighbours.add(new Coord(c.x, c.y + 1));
+        }
+
+        return neighbours;
     }
 
     private static void printWallGraph(Graph g, int w, int h) {
