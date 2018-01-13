@@ -8,8 +8,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Random;
 import java.util.Set;
 
 public class Graph {
@@ -17,7 +20,7 @@ public class Graph {
     private List<Node> nodes;
     private Map<Node, List<Node>> neighboursMap;
     public List<Face> faces;
-    public Map<Face, List<Face>> faceNeighboursMap;
+    public Map<Face, Set<Face>> faceNeighboursMap;
 
     public Graph() {
         nodes = new ArrayList<>();
@@ -44,7 +47,34 @@ public class Graph {
         return this;
     }
 
+    public Graph disconnect(int i1, int i2) {
+        return disconnect(nodes.get(i1), nodes.get(i2));
+    }
+
+    public Graph disconnect(Node n1, Node n2) {
+        neighboursMap.get(n1).remove(n2);
+        neighboursMap.get(n2).remove(n1);
+        return this;
+    }
+
+    public Collection<Node> getNeighbours(int i) {
+        return getNeighbours(nodes.get(i));
+    }
+
+    public Collection<Node> getNeighbours(Node node) {
+        return neighboursMap.get(node);
+    }
+
+    public int indexOf(Node node) {
+        return this.nodes.indexOf(node);
+    }
+
+    public boolean areNeighbours(int n1, int n2) {
+        return getNeighbours(n1).contains(nodes.get(n2));
+    }
+
     public Graph build() {
+        removeUnnecessaryNodes();
         sortNeighbours();
         computeFaces();
         removeBoundaryFace();
@@ -52,8 +82,57 @@ public class Graph {
         return this;
     }
 
+    private void removeUnnecessaryNodes() {
+        again: while (true) {
+            for (Node node : nodes) {
+                Collection<Node> neighbours = getNeighbours(node);
+                if (neighbours.size() <= 1) {
+                    for (Node neighbour : neighbours) {
+                        disconnect(node, neighbour);
+                    }
+                    nodes.remove(node);
+                    neighboursMap.remove(node);
+                    continue again;
+                }
+            }
+            break;
+        }
+    }
+
     private void removeBoundaryFace() {
         faces.remove(getBoundaryFace());
+    }
+
+    private void mergeFaces() {
+        Random random = new Random(0);
+        int iterations = 0;
+        again: while (iterations < 1000) {
+            iterations += 1;
+            List<Integer> indices = new ArrayList<>();
+            for (int i = 0; i < faces.size(); i++) {
+                indices.add(i);
+            }
+            Collections.shuffle(indices, random);
+            for (Integer index : indices) {
+                Face f1 = faces.get(index);
+                for (Face f2 : faceNeighboursMap.get(f1)) {
+                    if (Face.numFacesInCommon(f1, f2) == 1) {
+                        Face merged = Face.mergeFaces(f1, f2);
+                        faces.remove(f1);
+                        faces.remove(f2);
+                        faces.add(merged);
+                        Set<Face> mergedNeighbours = new HashSet<>();
+                        mergedNeighbours.addAll(faceNeighboursMap.get(f1));
+                        mergedNeighbours.addAll(faceNeighboursMap.get(f2));
+                        mergedNeighbours.remove(f1);
+                        mergedNeighbours.remove(f2);
+                        faceNeighboursMap.put(merged, mergedNeighbours);
+                        continue again;
+                    }
+                }
+            }
+            break;
+        }
     }
 
     public Painting computePainting() {
@@ -83,7 +162,7 @@ public class Graph {
     private void computeFaceNeighboursMap() {
         faceNeighboursMap = new HashMap<>();
         for (Face f1 : faces) {
-            List<Face> neigbours = new ArrayList<>();
+            Set<Face> neigbours = new HashSet<>();
             for (Face f2 : faces) {
                 if (f1.equals(f2)) {
                     continue;
@@ -189,5 +268,179 @@ public class Graph {
             }
         }
         return face;
+    }
+
+    private static Graph square(int width, int height, float cellSize) {
+        Graph graph = new Graph();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                graph.addNode(new PointF(cellSize * x, cellSize * y));
+            }
+        }
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width - 1; x++) {
+                int n = y * width + x;
+                graph.connect(n, n + 1);
+            }
+        }
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height - 1; y++) {
+                int n = y * width + x;
+                graph.connect(n, n + width);
+            }
+        }
+
+        return graph;
+    }
+
+    public static Graph bfsMazeGraph() {
+        int width = 20;
+        int height = 20;
+        int size = 100;
+
+        Graph faceGraph = new Graph();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                faceGraph.addNode(new PointF(size * x, size * y));
+            }
+        }
+
+        Random random = new Random();
+        boolean[][] visited = new boolean[width][height];
+        visited[0][0] = true;
+        dfsMaze(faceGraph, width, height, 0, 0, visited, random);
+
+        for (int i = 0; i < 40;) {
+            int x = random.nextInt(width - 1);
+            int y = random.nextInt(height);
+            int n1 = y * width + x;
+            int n2 = n1 + 1;
+            if (faceGraph.areNeighbours(n1, n2)) {
+                faceGraph.disconnect(n1, n2);
+                i += 1;
+            }
+        }
+
+        Graph wallGraph = square(width + 1, height + 1, size);
+        for (int i = 0; i < faceGraph.nodes.size(); i++) {
+            int x = i % width;
+            int y = i / width;
+            for (Node node : faceGraph.getNeighbours(i)) {
+                int ni = faceGraph.indexOf(node);
+                int nx = ni % width;
+                int ny = ni / width;
+                if (y == ny) {
+                    int wx = Math.max(x, nx);
+                    int wi1 = y * (width + 1) + wx;
+                    int wi2 = (y + 1) * (width + 1) + wx;
+                    wallGraph.disconnect(wi1, wi2);
+                }
+                if (x == nx) {
+                    int wy = Math.max(y, ny);
+                    int wi1 = wy * (width + 1) + x;
+                    int wi2 = wy * (width + 1) + (x + 1);
+                    wallGraph.disconnect(wi1, wi2);
+                }
+            }
+        }
+
+        printWallGraph(wallGraph, width + 1, height + 1);
+
+        return wallGraph;
+    }
+
+    private static void dfsMaze(Graph graph, int width, int height, int x, int y, boolean[][] visited, Random random) {
+        int n1 = y * width + x;
+        List<Coord> nexts = new ArrayList<>();
+        if (x > 0) {
+            nexts.add(new Coord(x - 1, y));
+        }
+        if (x < width - 1) {
+            nexts.add(new Coord(x + 1, y));
+        }
+        if (y > 0) {
+            nexts.add(new Coord(x, y - 1));
+        }
+        if (y < height - 1) {
+            nexts.add(new Coord(x, y + 1));
+        }
+        Collections.shuffle(nexts, random);
+        for (Coord next : nexts) {
+            if (!visited[next.x][next.y]) {
+                int n2 = next.y * width + next.x;
+                graph.connect(n1, n2);
+                visited[next.x][next.y] = true;
+                dfsMaze(graph, width, height, next.x, next.y, visited, random);
+            }
+        }
+    }
+
+    private static void printWallGraph(Graph g, int w, int h) {
+
+        StringBuilder builder = new StringBuilder();
+        for (int n = 0; n < w - 1; n++) {
+            builder.append('·');
+            if (g.areNeighbours(n, n + 1)) {
+                builder.append('-');
+            }
+            else {
+                builder.append(' ');
+            }
+        }
+        builder.append('·');
+        builder.append('\n');
+        for (int y = 1; y < h; ++y) {
+            for (int x = 0; x < w; x++) {
+                int n = y * w + x;
+                if (g.areNeighbours(n, n - w)) {
+                    builder.append('|');
+                }
+                else {
+                    builder.append(' ');
+                }
+                builder.append(' ');
+            }
+            builder.append('\n');
+            for (int x = 0; x < w - 1; x++) {
+                int n = y * w + x;
+                builder.append('·');
+                if (g.areNeighbours(n, n + 1)) {
+                    builder.append('-');
+                }
+                else {
+                    builder.append(' ');
+                }
+            }
+            builder.append('·');
+            builder.append('\n');
+        }
+        System.out.println(builder.toString());
+    }
+
+    public static class Coord {
+        public int x, y;
+
+        public Coord(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Coord coord = (Coord) o;
+
+            if (x != coord.x) return false;
+            return y == coord.y;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = x;
+            result = 31 * result + y;
+            return result;
+        }
     }
 }
