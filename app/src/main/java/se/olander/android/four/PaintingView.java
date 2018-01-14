@@ -194,17 +194,10 @@ public class PaintingView extends View {
                 measuredHeight = heightSize;
             }
             else if (heightMode == MeasureSpec.AT_MOST) {
-                float preferredWidth = painting.getHeight();
-                float preferredHeight = painting.getHeight();
-                float preferredRatio = preferredHeight / preferredWidth;
-                measuredHeight = Math.min(heightSize, (int) (preferredWidth * preferredRatio));
+                measuredHeight = Math.min(heightSize, (int) (measuredWidth * painting.getHeightToWidthRatio()));
             }
             else {
-                float preferredWidth = painting.getHeight();
-                float preferredHeight = painting.getHeight();
-                float preferredRatio = preferredHeight / preferredWidth;
-                measuredHeight = (int) (preferredWidth * preferredRatio);
-//                measuredHeight = 5000;
+                measuredHeight = (int) (measuredWidth * painting.getHeightToWidthRatio());
             }
             setMeasuredDimension(measuredWidth, measuredHeight);
         }

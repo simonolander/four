@@ -120,6 +120,10 @@ public class Painting {
         return getMaxY() - getMinY();
     }
 
+    public float getHeightToWidthRatio() {
+        return getHeight() / getWidth();
+    }
+
     public float getMinX() {
         float minX = Float.POSITIVE_INFINITY;
         for (PaintRegion region : regions) {

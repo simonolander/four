@@ -124,7 +124,7 @@ public abstract class MathUtils {
     public static <T> int countOccurrences(T[] array, T value) {
         int occurrences = 0;
         for (T t : array) {
-            if (t.equals(value)) {
+            if (t == null ? value == null : t.equals(value)) {
                 occurrences += 1;
             }
         }
