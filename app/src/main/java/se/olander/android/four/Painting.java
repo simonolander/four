@@ -91,7 +91,7 @@ public class Painting {
         return neighboursList.get(region);
     }
 
-    public boolean isCorrectlyColored() {
+    public boolean hasDiscoloredRegions() {
         return !getSomeDiscoloredRegions().isEmpty();
     }
 
@@ -154,6 +154,11 @@ public class Painting {
             maxY = Math.max(maxY, region.base.maxY);
         }
         return maxY;
+    }
+
+    @Nullable
+    public Colour getColor(PaintRegion region) {
+        return colors.get(region);
     }
 
     public static class PaintRegion {

@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.Stack;
 
 public class LevelFragment extends Fragment {
 
@@ -27,13 +28,16 @@ public class LevelFragment extends Fragment {
     private FloatingActionButton colorButton3;
     private FloatingActionButton colorButton4;
     private FloatingActionButton colorClearButton;
-    private Button doneButton;
+    private FloatingActionButton doneButton;
+    private FloatingActionButton undoButton;
 
     private LevelDto level;
 
     private long timeStart;
 
     private View currentSelectedColorButton;
+
+    private Stack<Colour[]> colorHistory;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,6 +49,7 @@ public class LevelFragment extends Fragment {
         }
         level = (LevelDto) args.getSerializable(LEVEL_KEY);
         timeStart = System.currentTimeMillis();
+        colorHistory = new Stack<>();
     }
 
     @Nullable
@@ -58,20 +63,30 @@ public class LevelFragment extends Fragment {
         paintingView.setOnRegionClickListener(new PaintingView.OnRegionClickListener() {
             @Override
             public void onRegionClick(Painting.PaintRegion region) {
+                Colour currentColor = paintingView.getPainting().getColor(region), nextColor;
                 if (currentSelectedColorButton == colorButton1) {
-                    paintingView.setRegionColor(region, Colour.COLOUR_1);
+                    nextColor = Colour.COLOUR_1;
                 }
-                if (currentSelectedColorButton == colorButton2) {
-                    paintingView.setRegionColor(region, Colour.COLOUR_2);
+                else if (currentSelectedColorButton == colorButton2) {
+                    nextColor = Colour.COLOUR_2;
                 }
-                if (currentSelectedColorButton == colorButton3) {
-                    paintingView.setRegionColor(region, Colour.COLOUR_3);
+                else if (currentSelectedColorButton == colorButton3) {
+                    nextColor = Colour.COLOUR_3;
                 }
-                if (currentSelectedColorButton == colorButton4) {
-                    paintingView.setRegionColor(region, Colour.COLOUR_4);
+                else if (currentSelectedColorButton == colorButton4) {
+                    nextColor = Colour.COLOUR_4;
                 }
-                if (currentSelectedColorButton == colorClearButton) {
-                    paintingView.setRegionColor(region, null);
+                else if (currentSelectedColorButton == colorClearButton) {
+                    nextColor = null;
+                }
+                else {
+                    return;
+                }
+
+                if (currentColor != nextColor) {
+                    colorHistory.push(paintingView.getColorArray());
+                    paintingView.setRegionColor(region, nextColor);
+                    updateDoneButton();
                 }
             }
         });
@@ -138,9 +153,31 @@ public class LevelFragment extends Fragment {
             }
         });
 
+        undoButton = view.findViewById(R.id.undo);
+        undoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!colorHistory.isEmpty()) {
+                    Colour[] colors = colorHistory.pop();
+                    paintingView.setColorArray(colors);
+                    updateDoneButton();
+                }
+            }
+        });
+
         onColorButtonClick(colorButton1);
+        updateDoneButton();
 
         return view;
+    }
+
+    private void updateDoneButton() {
+        if (paintingView.getPainting().hasDiscoloredRegions()) {
+            doneButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(android.R.color.holo_orange_dark)));
+        }
+        else {
+            doneButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(android.R.color.holo_green_dark)));
+        }
     }
 
     private void onColorButtonClick(View view) {
