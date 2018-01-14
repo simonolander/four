@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.Region;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -40,10 +41,12 @@ public class PaintingView extends View {
     private Matrix matrix;
     private Matrix inverseMatrix = new Matrix();
 
+    private boolean selectRegionEnabled;
     private Painting.PaintRegion currentSelectedRegion;
     private long currentSelectedRegionTime;
 
     private OnSelectedRegionChangedListener onSelectedRegionChangedListener;
+    private OnRegionClickListener onRegionClickListener;
 
     public PaintingView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -67,6 +70,14 @@ public class PaintingView extends View {
 
     public void setPainting(Painting painting) {
         this.painting = painting;
+    }
+
+    public void setSelectRegionEnabled(boolean enabled) {
+        this.selectRegionEnabled = enabled;
+    }
+
+    public void setOnRegionClickListener(OnRegionClickListener onRegionClickListener) {
+        this.onRegionClickListener = onRegionClickListener;
     }
 
     @Override
@@ -216,7 +227,13 @@ public class PaintingView extends View {
 
     private void onClick(float x, float y) {
         PointF point = toPaintingPoint(x, y);
-        setCurrentSelectedRegion(painting.getRegion(point));
+        Painting.PaintRegion clickedRegion = painting.getRegion(point);
+        if (selectRegionEnabled) {
+            setCurrentSelectedRegion(clickedRegion);
+        }
+        if (onRegionClickListener != null) {
+            onRegionClickListener.onRegionClick(clickedRegion);
+        }
         postInvalidate();
     }
 
@@ -231,11 +248,15 @@ public class PaintingView extends View {
     }
 
     public void setSelectedRegionColor(Colour colour) {
-        if (this.currentSelectedRegion == null) {
+        setRegionColor(currentSelectedRegion, colour);
+    }
+
+    public void setRegionColor(Painting.PaintRegion region, Colour colour) {
+        if (region == null) {
             return;
         }
 
-        painting.colors.put(this.currentSelectedRegion, colour);
+        painting.colors.put(region, colour);
         postInvalidate();
     }
 
@@ -330,5 +351,9 @@ public class PaintingView extends View {
 
     public interface OnSelectedRegionChangedListener {
         void onSelectedRegionChanged();
+    }
+
+    public interface OnRegionClickListener {
+        void onRegionClick(Painting.PaintRegion region);
     }
 }

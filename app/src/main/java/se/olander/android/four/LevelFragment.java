@@ -21,6 +21,7 @@ public class LevelFragment extends Fragment {
 
     private static final String TAG = LevelFragment.class.getSimpleName();
 
+    private PaintingView paintingView;
     private FloatingActionButton colorButton1;
     private FloatingActionButton colorButton2;
     private FloatingActionButton colorButton3;
@@ -36,6 +37,8 @@ public class LevelFragment extends Fragment {
     private LevelDto level;
 
     private long timeStart;
+
+    private View currentSelectedColorButton;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,55 +57,80 @@ public class LevelFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_level, container, false);
 
-        final PaintingView paintingView = view.findViewById(R.id.painting);
+        paintingView = view.findViewById(R.id.painting);
         paintingView.setColors(color1, color2, color3, color4);
 
-        Painting painting = level.getPainting();
+        final Painting painting = level.getPainting();
         paintingView.setPainting(painting);
+        paintingView.setOnRegionClickListener(new PaintingView.OnRegionClickListener() {
+            @Override
+            public void onRegionClick(Painting.PaintRegion region) {
+                if (currentSelectedColorButton == colorButton1) {
+                    paintingView.setRegionColor(region, Colour.COLOUR_1);
+                }
+                if (currentSelectedColorButton == colorButton2) {
+                    paintingView.setRegionColor(region, Colour.COLOUR_2);
+                }
+                if (currentSelectedColorButton == colorButton3) {
+                    paintingView.setRegionColor(region, Colour.COLOUR_3);
+                }
+                if (currentSelectedColorButton == colorButton4) {
+                    paintingView.setRegionColor(region, Colour.COLOUR_4);
+                }
+                if (currentSelectedColorButton == colorClearButton) {
+                    paintingView.setRegionColor(region, null);
+                }
+            }
+        });
 
         colorButton1 = view.findViewById(R.id.color_1);
         colorButton1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                paintingView.setSelectedRegionColor(Colour.COLOUR_1);
+                onColorButtonClick(view);
             }
         });
         colorButton1.setBackgroundTintList(ColorStateList.valueOf(color1));
+        colorButton1.setSize(FloatingActionButton.SIZE_MINI);
 
         colorButton2 = view.findViewById(R.id.color_2);
         colorButton2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                paintingView.setSelectedRegionColor(Colour.COLOUR_2);
+                onColorButtonClick(view);
             }
         });
         colorButton2.setBackgroundTintList(ColorStateList.valueOf(color2));
+        colorButton2.setSize(FloatingActionButton.SIZE_MINI);
 
         colorButton3 = view.findViewById(R.id.color_3);
         colorButton3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                paintingView.setSelectedRegionColor(Colour.COLOUR_3);
+                onColorButtonClick(view);
             }
         });
         colorButton3.setBackgroundTintList(ColorStateList.valueOf(color3));
+        colorButton3.setSize(FloatingActionButton.SIZE_MINI);
 
         colorButton4 = view.findViewById(R.id.color_4);
         colorButton4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                paintingView.setSelectedRegionColor(Colour.COLOUR_4);
+                onColorButtonClick(view);
             }
         });
         colorButton4.setBackgroundTintList(ColorStateList.valueOf(color4));
+        colorButton4.setSize(FloatingActionButton.SIZE_MINI);
 
         colorClearButton = view.findViewById(R.id.color_clear);
         colorClearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                paintingView.setSelectedRegionColor(null);
+                onColorButtonClick(view);
             }
         });
+        colorClearButton.setSize(FloatingActionButton.SIZE_MINI);
 
         doneButton = view.findViewById(R.id.done);
         doneButton.setOnClickListener(new View.OnClickListener() {
@@ -118,6 +146,34 @@ public class LevelFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void onColorButtonClick(View view) {
+        colorButton1.setSize(FloatingActionButton.SIZE_MINI);
+        colorButton2.setSize(FloatingActionButton.SIZE_MINI);
+        colorButton3.setSize(FloatingActionButton.SIZE_MINI);
+        colorButton4.setSize(FloatingActionButton.SIZE_MINI);
+        colorClearButton.setSize(FloatingActionButton.SIZE_MINI);
+        if (view == colorButton1) {
+            colorButton1.setSize(FloatingActionButton.SIZE_NORMAL);
+            currentSelectedColorButton = colorButton1;
+        }
+        if (view == colorButton2) {
+            colorButton2.setSize(FloatingActionButton.SIZE_NORMAL);
+            currentSelectedColorButton = colorButton2;
+        }
+        if (view == colorButton3) {
+            colorButton3.setSize(FloatingActionButton.SIZE_NORMAL);
+            currentSelectedColorButton = colorButton3;
+        }
+        if (view == colorButton4) {
+            colorButton4.setSize(FloatingActionButton.SIZE_NORMAL);
+            currentSelectedColorButton = colorButton4;
+        }
+        if (view == colorClearButton) {
+            colorClearButton.setSize(FloatingActionButton.SIZE_NORMAL);
+            currentSelectedColorButton = colorClearButton;
+        }
     }
 
     private void victory() {
