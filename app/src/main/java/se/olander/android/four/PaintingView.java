@@ -6,16 +6,15 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.graphics.Region;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
 import java.util.List;
-import java.util.Map;
 
 public class PaintingView extends View {
     private static final String TAG = PaintingView.class.getSimpleName();
@@ -49,6 +48,8 @@ public class PaintingView extends View {
     private OnSelectedRegionChangedListener onSelectedRegionChangedListener;
     private OnRegionClickListener onRegionClickListener;
 
+    private boolean enabled;
+
     public PaintingView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
@@ -63,6 +64,7 @@ public class PaintingView extends View {
         gestureDetector = new GestureDetector(getContext(), new PaintingOnGestureListener());
         gestureDetector.setOnDoubleTapListener(new PaintingOnDoubleTapListener());
         gestureDetector.setIsLongpressEnabled(false);
+        enabled = true;
     }
 
     public Painting getPainting() {
@@ -79,6 +81,11 @@ public class PaintingView extends View {
 
     public void setOnRegionClickListener(OnRegionClickListener onRegionClickListener) {
         this.onRegionClickListener = onRegionClickListener;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     @Override
@@ -171,15 +178,54 @@ public class PaintingView extends View {
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        fitPaintingToScreen();
+        fitPaintingToView();
     }
 
-    private void fitPaintingToScreen() {
-        float screenWidth = getWidth();
-        float screenHeight = getHeight();
-        float screenRatio = screenHeight / screenWidth;
-        float screenCenterX = getX() + screenWidth / 2;
-        float screenCenterY = getY() + screenHeight / 2;
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+        if (widthMode == MeasureSpec.EXACTLY) {
+            final int measuredWidth, measuredHeight;
+            measuredWidth = widthSize;
+            if (heightMode == MeasureSpec.EXACTLY) {
+                measuredHeight = heightSize;
+            }
+            else if (heightMode == MeasureSpec.AT_MOST) {
+                float preferredWidth = painting.getHeight();
+                float preferredHeight = painting.getHeight();
+                float preferredRatio = preferredHeight / preferredWidth;
+                measuredHeight = Math.min(heightSize, (int) (preferredWidth * preferredRatio));
+            }
+            else {
+                float preferredWidth = painting.getHeight();
+                float preferredHeight = painting.getHeight();
+                float preferredRatio = preferredHeight / preferredWidth;
+                measuredHeight = (int) (preferredWidth * preferredRatio);
+//                measuredHeight = 5000;
+            }
+            setMeasuredDimension(measuredWidth, measuredHeight);
+        }
+        else {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        }
+
+//        Log.d(TAG, "onMeasure width size: " + MeasureSpec.getSize(widthMeasureSpec));
+//        Log.d(TAG, "onMeasure width mode: " + (widthMode == MeasureSpec.AT_MOST ? "AT_MOST" : widthMode == MeasureSpec.EXACTLY ? "EXACTLY" : widthMode == MeasureSpec.UNSPECIFIED ? "UNSPECIFIED" : "OTHER (" + widthMode + ")"));
+//        Log.d(TAG, "onMeasure height size: " + MeasureSpec.getSize(heightMeasureSpec));
+//        Log.d(TAG, "onMeasure height mode: " + (heightMode == MeasureSpec.AT_MOST ? "AT_MOST" : heightMode == MeasureSpec.EXACTLY ? "EXACTLY" : heightMode == MeasureSpec.UNSPECIFIED ? "UNSPECIFIED" : "OTHER (" + heightMode + ")"));
+    }
+
+    private void fitPaintingToView() {
+        float viewWidth = getWidth();
+        float viewHeight = getHeight();
+        float viewRatio = viewHeight / viewWidth;
+//        float viewCenterX = getX() + viewWidth / 2;
+        float viewCenterX = viewWidth / 2;
+//        float viewCenterY = getY() + viewHeight / 2;
+        float viewCenterY = viewHeight / 2;
         float paintingMinX = painting.getMinX();
         float paintingMinY = painting.getMinY();
         float paintingWidth = painting.getWidth();
@@ -189,16 +235,16 @@ public class PaintingView extends View {
         float paintingCenterY = paintingMinY + paintingHeight / 2;
 
 
-        float tx = screenCenterX - paintingCenterX;
-        float ty = screenCenterY - paintingCenterY;
-        float scale = screenRatio > paintingRatio
-            ? screenWidth / paintingWidth
-            : screenHeight / paintingHeight;
+        float tx = viewCenterX - paintingCenterX;
+        float ty = viewCenterY - paintingCenterY;
+        float scale = viewRatio > paintingRatio
+            ? viewWidth / paintingWidth
+            : viewHeight / paintingHeight;
         scale *= 0.75;
 
         matrix.reset();
         matrix.postTranslate(tx, ty);
-        matrix.postScale(scale, scale, screenCenterX, screenCenterY);
+        matrix.postScale(scale, scale, viewCenterX, viewCenterY);
         minScale = scale;
         maxScale = scale * 4;
     }
@@ -285,6 +331,10 @@ public class PaintingView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!enabled) {
+            return false;
+        }
+
         boolean retVal = scaleGestureDetector.onTouchEvent(event);
         retVal = gestureDetector.onTouchEvent(event) || retVal;
         return retVal || super.onTouchEvent(event);
@@ -303,6 +353,11 @@ public class PaintingView extends View {
 
     public Colour[] getColorArray() {
         return painting.getColorArray();
+    }
+
+    public void setColorArray(Colour[] colorArray) {
+        painting.setColorArray(colorArray);
+        postInvalidate();
     }
 
     private class PaintingOnGestureListener extends GestureDetector.SimpleOnGestureListener {

@@ -29,11 +29,6 @@ public class LevelFragment extends Fragment {
     private FloatingActionButton colorClearButton;
     private Button doneButton;
 
-    private int color1 = 0xffff867c;
-    private int color2 = 0xff99d066;
-    private int color3 = 0xfffff263;
-    private int color4 = 0xff5eb8ff;
-
     private LevelDto level;
 
     private long timeStart;
@@ -58,10 +53,8 @@ public class LevelFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_level, container, false);
 
         paintingView = view.findViewById(R.id.painting);
-        paintingView.setColors(color1, color2, color3, color4);
-
-        final Painting painting = level.getPainting();
-        paintingView.setPainting(painting);
+        paintingView.setColors(LevelUtils.getColor1(), LevelUtils.getColor2(), LevelUtils.getColor3(), LevelUtils.getColor4());
+        paintingView.setPainting(level.getPainting());
         paintingView.setOnRegionClickListener(new PaintingView.OnRegionClickListener() {
             @Override
             public void onRegionClick(Painting.PaintRegion region) {
@@ -90,7 +83,7 @@ public class LevelFragment extends Fragment {
                 onColorButtonClick(view);
             }
         });
-        colorButton1.setBackgroundTintList(ColorStateList.valueOf(color1));
+        colorButton1.setBackgroundTintList(ColorStateList.valueOf(LevelUtils.getColor1()));
         colorButton1.setSize(FloatingActionButton.SIZE_MINI);
 
         colorButton2 = view.findViewById(R.id.color_2);
@@ -100,7 +93,7 @@ public class LevelFragment extends Fragment {
                 onColorButtonClick(view);
             }
         });
-        colorButton2.setBackgroundTintList(ColorStateList.valueOf(color2));
+        colorButton2.setBackgroundTintList(ColorStateList.valueOf(LevelUtils.getColor2()));
         colorButton2.setSize(FloatingActionButton.SIZE_MINI);
 
         colorButton3 = view.findViewById(R.id.color_3);
@@ -110,7 +103,7 @@ public class LevelFragment extends Fragment {
                 onColorButtonClick(view);
             }
         });
-        colorButton3.setBackgroundTintList(ColorStateList.valueOf(color3));
+        colorButton3.setBackgroundTintList(ColorStateList.valueOf(LevelUtils.getColor3()));
         colorButton3.setSize(FloatingActionButton.SIZE_MINI);
 
         colorButton4 = view.findViewById(R.id.color_4);
@@ -120,7 +113,7 @@ public class LevelFragment extends Fragment {
                 onColorButtonClick(view);
             }
         });
-        colorButton4.setBackgroundTintList(ColorStateList.valueOf(color4));
+        colorButton4.setBackgroundTintList(ColorStateList.valueOf(LevelUtils.getColor4()));
         colorButton4.setSize(FloatingActionButton.SIZE_MINI);
 
         colorClearButton = view.findViewById(R.id.color_clear);
@@ -144,6 +137,8 @@ public class LevelFragment extends Fragment {
                 }
             }
         });
+
+        onColorButtonClick(colorButton1);
 
         return view;
     }

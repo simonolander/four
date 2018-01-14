@@ -1,195 +1,216 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_margin="20dp">
-
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="You won!"
-        android:textSize="36sp" />
-    
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="20dp" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Total Time"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/total_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:textSize="18sp"
-            android:text="9999" />
-
-    </RelativeLayout>
-
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="20dp" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Number of Regions"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/number_of_regions"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:textSize="18sp"
-            android:text="9999" />
-
-    </RelativeLayout>
-
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="20dp" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Number of Color 1"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/number_of_color_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:textSize="18sp"
-            android:text="9999" />
-
-    </RelativeLayout>
-
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="20dp" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Number of Color 2"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/number_of_color_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:textSize="18sp"
-            android:text="9999" />
-
-    </RelativeLayout>
-
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="20dp" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Number of Color 3"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/number_of_color_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:textSize="18sp"
-            android:text="9999" />
-
-    </RelativeLayout>
-
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="20dp" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Number of Color 4"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/number_of_color_4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:textSize="18sp"
-            android:text="9999" />
-
-    </RelativeLayout>
-
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="20dp" />
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_margin="20dp">
 
-        <Button
-            android:id="@+id/nextLevel"
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="You won!"
+            android:textSize="36sp" />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="20dp" />
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Next Level"/>
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/select_levels"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total Time"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/total_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:textSize="18sp"
+                android:text="9999" />
+
+        </RelativeLayout>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="20dp" />
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Back to Levels"/>
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/replay"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Number of Regions"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/number_of_regions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:textSize="18sp"
+                android:text="9999" />
+
+        </RelativeLayout>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="20dp" />
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Replay"/>
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Number of Color 1"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/number_of_color_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:textSize="18sp"
+                android:text="9999" />
+
+        </RelativeLayout>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="20dp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Number of Color 2"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/number_of_color_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:textSize="18sp"
+                android:text="9999" />
+
+        </RelativeLayout>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="20dp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Number of Color 3"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/number_of_color_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:textSize="18sp"
+                android:text="9999" />
+
+        </RelativeLayout>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="20dp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Number of Color 4"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/number_of_color_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:textSize="18sp"
+                android:text="9999" />
+
+        </RelativeLayout>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="20dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/nextLevel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Next Level"/>
+
+            <Button
+                android:id="@+id/select_levels"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Back to Levels"/>
+
+            <Button
+                android:id="@+id/replay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Replay"/>
+
+        </LinearLayout>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="20dp" />
+
+        <se.olander.android.four.PaintingView
+            android:id="@+id/painting"
+            android:background="@drawable/texture_crumbled_paper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="40dp" />
 
     </LinearLayout>
 
-</LinearLayout>
+</ScrollView>

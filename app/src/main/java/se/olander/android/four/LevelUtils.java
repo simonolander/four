@@ -2,6 +2,7 @@ package se.olander.android.four;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -73,6 +74,41 @@ class LevelUtils {
             }
         }
         return null;
+    }
+
+    public static int getColor(Colour colour) {
+        if (colour == null) {
+            return Color.WHITE;
+        }
+
+        switch (colour) {
+            case COLOUR_1:
+                return getColor1();
+            case COLOUR_2:
+                return getColor2();
+            case COLOUR_3:
+                return getColor3();
+            case COLOUR_4:
+                return getColor4();
+            default:
+                return Color.WHITE;
+        }
+    }
+
+    public static int getColor1() {
+        return 0xffff867c;
+    }
+
+    public static int getColor2() {
+        return 0xff99d066;
+    }
+
+    public static int getColor3() {
+        return 0xfffff263;
+    }
+
+    public static int getColor4() {
+        return 0xff5eb8ff;
     }
 
     private static class LevelDtoMeta {

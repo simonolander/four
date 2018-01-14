@@ -90,6 +90,12 @@ public class VictoryScreenFragment extends Fragment {
             }
         });
 
+        PaintingView paintingView = view.findViewById(R.id.painting);
+        paintingView.setPainting(level.getPainting());
+        paintingView.setColors(LevelUtils.getColor1(), LevelUtils.getColor2(), LevelUtils.getColor3(), LevelUtils.getColor4());
+        paintingView.setColorArray(colorArray);
+        paintingView.setEnabled(false);
+
         return view;
     }
 
