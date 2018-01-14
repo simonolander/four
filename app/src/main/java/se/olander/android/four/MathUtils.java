@@ -120,4 +120,14 @@ public abstract class MathUtils {
     public static float cross(float x1, float y1, float x2, float y2) {
         return x1 * y2 - x2 * y1;
     }
+
+    public static <T> int countOccurrences(T[] array, T value) {
+        int occurrences = 0;
+        for (T t : array) {
+            if (t.equals(value)) {
+                occurrences += 1;
+            }
+        }
+        return occurrences;
+    }
 }

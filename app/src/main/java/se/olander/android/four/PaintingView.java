@@ -15,6 +15,7 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 
 import java.util.List;
+import java.util.Map;
 
 public class PaintingView extends View {
     private static final String TAG = PaintingView.class.getSimpleName();
@@ -298,6 +299,10 @@ public class PaintingView extends View {
 
     public void setOnSelectedRegionChangedListener(OnSelectedRegionChangedListener listener) {
         this.onSelectedRegionChangedListener = listener;
+    }
+
+    public Colour[] getColorArray() {
+        return painting.getColorArray();
     }
 
     private class PaintingOnGestureListener extends GestureDetector.SimpleOnGestureListener {

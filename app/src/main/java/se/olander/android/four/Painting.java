@@ -63,6 +63,14 @@ public class Painting {
         return null;
     }
 
+    public Colour[] getColorArray() {
+        Colour[] colours = new Colour[regions.size()];
+        for (int i = 0; i < regions.size(); i++) {
+            colours[i] = colors.get(regions.get(i));
+        }
+        return colours;
+    }
+
     public int getRegionIndex(PaintRegion region) {
         Objects.requireNonNull(region);
         for (int i = 0; i < regions.size(); i++) {

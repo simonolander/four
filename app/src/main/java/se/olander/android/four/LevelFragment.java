@@ -183,7 +183,10 @@ public class LevelFragment extends Fragment {
         manager.popBackStack();
         manager
             .beginTransaction()
-            .replace(R.id.fragment_container, VictoryScreenFragment.newInstance(level, System.currentTimeMillis() - timeStart))
+            .replace(R.id.fragment_container, VictoryScreenFragment.newInstance(
+                level,
+               System.currentTimeMillis() - timeStart,
+                paintingView.getColorArray()))
             .addToBackStack(null)
             .commit();
     }
