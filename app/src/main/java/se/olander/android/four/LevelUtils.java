@@ -2,15 +2,18 @@ package se.olander.android.four;
 
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.graphics.PointF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +23,20 @@ import java.util.List;
  */
 
 class LevelUtils {
+    private static LevelDto parserLevelDto(Reader reader) throws IOException {
+        Gson gson = new Gson();
+        String json = IOUtils.toString(reader);
+        LevelDtoMeta levelDtoMeta = gson.fromJson(json, LevelDtoMeta.class);
+        switch (levelDtoMeta.type) {
+            case RAW:
+                return gson.fromJson(json, RawLevelDto.class);
+            case SQUARE_DFS_MAZE:
+                return gson.fromJson(json, SquareMazeLevelDto.class);
+            default:
+                throw new JsonParseException("Unknown level type: " + levelDtoMeta.type);
+        }
+    }
+
     @NonNull
     public static List<LevelDto> getLevels(@NonNull Context context) {
         ArrayList<LevelDto> levels = new ArrayList<>();
@@ -30,8 +47,7 @@ class LevelUtils {
                 try {
                     InputStream in = assets.open("levels/" + fileName);
                     InputStreamReader reader = new InputStreamReader(in);
-                    Gson gson = new Gson();
-                    LevelDto level = gson.fromJson(reader, LevelDto.class);
+                    LevelDto level = parserLevelDto(reader);
                     levels.add(level);
                 }
                 catch (Exception e) {
@@ -59,10 +75,7 @@ class LevelUtils {
         return null;
     }
 
-    void createLevel(List<PointF> points) {
-        PointF p1 = new PointF(0, 0);
-        PointF p2 = new PointF(500, 0);
-        PointF p3 = new PointF(500, 500);
-        PointF p4 = new PointF(0, 500);
+    private static class LevelDtoMeta {
+        LevelDto.Type type;
     }
 }

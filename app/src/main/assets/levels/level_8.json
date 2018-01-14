@@ -1,0 +1,9 @@
+{
+  "type": "SQUARE_DFS_MAZE",
+  "version": 1,
+  "ordinal": 8,
+  "name": "Level 8",
+  "width": 20,
+  "height": 20,
+  "seed": 2
+}

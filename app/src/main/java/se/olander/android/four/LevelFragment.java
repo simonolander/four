@@ -1,7 +1,6 @@
 package se.olander.android.four;
 
 import android.content.res.ColorStateList;
-import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -58,46 +57,7 @@ public class LevelFragment extends Fragment {
         final PaintingView paintingView = view.findViewById(R.id.painting);
         paintingView.setColors(color1, color2, color3, color4);
 
-//        Painting painting = level.getPainting();
-        Painting painting = Graph.bfsMazeGraph().build().computePainting();
-//        Painting painting = new Graph()
-//            .addNode(new PointF(0, 0))
-//            .addNode(new PointF(500, 300))
-//            .addNode(new PointF(1000, 0))
-//            .addNode(new PointF(200, 500))
-//            .addNode(new PointF(700, 500))
-//            .addNode(new PointF(1300, 500))
-//            .addNode(new PointF(0, 1000))
-//            .addNode(new PointF(500, 1000))
-//            .addNode(new PointF(1000, 1000))
-//            .addNode(new PointF(300, 1500))
-//            .addNode(new PointF(700, 1500))
-//            .addNode(new PointF(300, 2000))
-//            .addNode(new PointF(700, 2000))
-//            .connect(0, 1)
-//            .connect(0, 3)
-//            .connect(1, 2)
-//            .connect(1, 3)
-//            .connect(1, 4)
-//            .connect(2, 4)
-//            .connect(2, 5)
-//            .connect(3, 4)
-//            .connect(3, 6)
-//            .connect(3, 7)
-//            .connect(4, 5)
-//            .connect(4, 7)
-//            .connect(4, 8)
-//            .connect(5, 8)
-//            .connect(6, 7)
-//            .connect(7, 8)
-//            .connect(7, 9)
-//            .connect(7, 10)
-//            .connect(9, 10)
-//            .connect(9, 11)
-//            .connect(10, 12)
-//            .connect(11, 12)
-//            .build()
-//            .computePainting();
+        Painting painting = level.getPainting();
         paintingView.setPainting(painting);
 
         colorButton1 = view.findViewById(R.id.color_1);

@@ -1,50 +1,47 @@
 package se.olander.android.four;
 
-import android.graphics.PointF;
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
-public class LevelDto implements Comparable<LevelDto>, Serializable {
+/**
+ * Created by sios on 2018-01-13.
+ */
+
+public abstract class LevelDto implements Comparable<LevelDto>, Serializable {
+
+    public enum Type {
+        RAW,
+        SQUARE_DFS_MAZE
+    }
+
     public int version;
     public int ordinal;
     public String name;
-    public List<PaintRegionDto> regions;
-    public List<List<Integer>> neighboursList;
+    public Type type;
 
     @Override
     public int compareTo(@NonNull LevelDto other) {
-        return Integer.compare(this.ordinal, other.ordinal);
+        return Integer.compare(this.getOrdinal(), other.getOrdinal());
     }
 
-    public Painting getPainting() {
-        List<Painting.PaintRegion> regions = new ArrayList<>();
-        for (PaintRegionDto regionDto : this.regions) {
-            Painting.Polygon base = new Painting.Polygon(regionDto.base.points);
-
-            Painting.Polygon[] holes = new Painting.Polygon[regionDto.holes != null ? regionDto.holes.length : 0];
-            if (regionDto.holes != null) {
-                for (int i = 0; i < regionDto.holes.length; i++) {
-                    holes[i] = new Painting.Polygon(regionDto.holes[i].points);
-                }
-            }
-            regions.add(new Painting.PaintRegion(base, holes));
-        }
-        return new Painting(regions, neighboursList);
+    public int getVersion() {
+        return version;
     }
 
-    @Override
-    public String toString() {
-        return "LevelDto{" +
-            "version=" + version +
-            ", ordinal=" + ordinal +
-            ", name='" + name + '\'' +
-            ", regions=" + regions +
-            ", neighboursList=" + neighboursList +
-            '}' ;
+    public int getOrdinal() {
+        return ordinal;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public abstract Painting getPainting();
 
     @Override
     public boolean equals(Object o) {
@@ -53,23 +50,18 @@ public class LevelDto implements Comparable<LevelDto>, Serializable {
 
         LevelDto levelDto = (LevelDto) o;
 
+        if (version != levelDto.version) return false;
         if (ordinal != levelDto.ordinal) return false;
-        return name != null ? name.equals(levelDto.name) : levelDto.name == null;
+        if (name != null ? !name.equals(levelDto.name) : levelDto.name != null) return false;
+        return type == levelDto.type;
     }
 
     @Override
     public int hashCode() {
-        int result = ordinal;
+        int result = version;
+        result = 31 * result + ordinal;
         result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
         return result;
-    }
-
-    public class PaintRegionDto implements Serializable {
-        PolygonDto base;
-        PolygonDto[] holes;
-    }
-
-    public class PolygonDto implements Serializable {
-        List<PointF> points;
     }
 }
