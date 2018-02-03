@@ -13,7 +13,8 @@ class LevelViewHolder extends RecyclerView.ViewHolder implements View.OnClickLis
 
     LevelViewHolder(View view) {
         super(view);
-        this.levelName = view.findViewById(R.id.level_name);
+        levelName = view.findViewById(R.id.level_name);
+
         view.setOnClickListener(this);
     }
 
