@@ -67,7 +67,7 @@ public class VictoryScreenFragment extends Fragment {
         nextLevelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                replaceFragment(nextLevel != null ? LevelFragment.newInstance(nextLevel) : SelectLevelFragment.newInstance());
+                replaceFragment(nextLevel != null ? LevelFragment.newInstance(nextLevel) : SelectLevelFragmentItem.newInstance());
             }
         });
         if (nextLevel == null) {
@@ -86,7 +86,7 @@ public class VictoryScreenFragment extends Fragment {
         selectLevelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                replaceFragment(SelectLevelFragment.newInstance());
+                replaceFragment(SelectLevelFragmentItem.newInstance());
             }
         });
 
