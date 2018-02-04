@@ -1,0 +1,9 @@
+{
+  "type": "SQUARE_DFS_MAZE",
+  "version": 1,
+  "ordinal": 11,
+  "name": "Maze 16x16",
+  "width": 16,
+  "height": 16,
+  "seed": 10
+}

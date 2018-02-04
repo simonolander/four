@@ -2,7 +2,7 @@
   "type": "SQUARE_DFS_MAZE",
   "version": 1,
   "ordinal": 8,
-  "name": "Level 8",
+  "name": "Maze 10x15",
   "width": 10,
   "height": 15,
   "seed": 8

@@ -2,7 +2,7 @@
   "type": "RAW",
   "version": 1,
   "ordinal": 4,
-  "name": "Level 4",
+  "name": "Maze 8x8",
   "regions": [
     {
       "base": {
