@@ -17,6 +17,7 @@ public abstract class LevelDto implements Comparable<LevelDto>, Serializable {
 
     public int version;
     public int ordinal;
+    public String id;
     public String name;
     public Type type;
 
