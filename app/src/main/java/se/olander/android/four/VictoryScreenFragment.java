@@ -14,13 +14,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class VictoryScreenFragment extends Fragment {
-    private static final String LEVEL_KEY = "LEVEL_KEY";
-    private static final String TOTAL_TIME_KEY = "TOTAL_TIME_KEY";
-    private static final String COLOR_ARRAY_KEY = "COLOR_ARRAY_KEY";
+    private static final String COMPLETED_GAME_KEY = "COMPLETED_GAME_KEY";
 
-    private long totalTime;
-    private LevelDto level;
-    private Colour[] colorArray;
+    private SavedGame savedGame;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -29,9 +25,10 @@ public class VictoryScreenFragment extends Fragment {
         if (args == null) {
             throw new IllegalArgumentException("Arguments are null, user newInstance()");
         }
-        level = (LevelDto) args.getSerializable(LEVEL_KEY);
-        totalTime = args.getLong(TOTAL_TIME_KEY);
-        colorArray = (Colour[]) args.getSerializable(COLOR_ARRAY_KEY);
+        savedGame = (SavedGame) args.getSerializable(COMPLETED_GAME_KEY);
+        if (savedGame == null) {
+            throw new IllegalArgumentException("Completed game is null, check newInstance()");
+        }
     }
 
     @Override
@@ -41,29 +38,29 @@ public class VictoryScreenFragment extends Fragment {
         assert context != null;
 
         TextView totalTimeTextView = view.findViewById(R.id.total_time);
-        totalTimeTextView.setText(FormatUtils.formatHHmmssms(totalTime));
+        totalTimeTextView.setText(FormatUtils.formatHHmmssms(savedGame.timePlayed));
 
         TextView numberOfRegionsTextView = view.findViewById(R.id.number_of_regions);
-        numberOfRegionsTextView.setText(FormatUtils.formatNumber(colorArray.length));
+        numberOfRegionsTextView.setText(FormatUtils.formatNumber(savedGame.colorArray.length));
 
-        int numberOfColor1 = MathUtils.countOccurrences(colorArray, Colour.COLOUR_1);
+        int numberOfColor1 = MathUtils.countOccurrences(savedGame.colorArray, Colour.COLOUR_1);
         TextView numberOfColor1TextView = view.findViewById(R.id.number_of_color_1);
         numberOfColor1TextView.setText(FormatUtils.formatNumber(numberOfColor1));
 
-        int numberOfColor2 = MathUtils.countOccurrences(colorArray, Colour.COLOUR_2);
+        int numberOfColor2 = MathUtils.countOccurrences(savedGame.colorArray, Colour.COLOUR_2);
         TextView numberOfColor2TextView = view.findViewById(R.id.number_of_color_2);
         numberOfColor2TextView.setText(FormatUtils.formatNumber(numberOfColor2));
 
-        int numberOfColor3 = MathUtils.countOccurrences(colorArray, Colour.COLOUR_3);
+        int numberOfColor3 = MathUtils.countOccurrences(savedGame.colorArray, Colour.COLOUR_3);
         TextView numberOfColor3TextView = view.findViewById(R.id.number_of_color_3);
         numberOfColor3TextView.setText(FormatUtils.formatNumber(numberOfColor3));
 
-        int numberOfColor4 = MathUtils.countOccurrences(colorArray, Colour.COLOUR_4);
+        int numberOfColor4 = MathUtils.countOccurrences(savedGame.colorArray, Colour.COLOUR_4);
         TextView numberOfColor4TextView = view.findViewById(R.id.number_of_color_4);
         numberOfColor4TextView.setText(FormatUtils.formatNumber(numberOfColor4));
 
         Button nextLevelButton = view.findViewById(R.id.nextLevel);
-        final LevelDto nextLevel = LevelUtils.getNextLevel(context, level);
+        final LevelDto nextLevel = LevelUtils.getNextLevel(context, savedGame.level);
         nextLevelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -78,7 +75,7 @@ public class VictoryScreenFragment extends Fragment {
         replayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                replaceFragment(LevelFragment.newInstance(level));
+                replaceFragment(LevelFragment.newInstance(savedGame.level));
             }
         });
 
@@ -91,9 +88,9 @@ public class VictoryScreenFragment extends Fragment {
         });
 
         PaintingView paintingView = view.findViewById(R.id.painting);
-        paintingView.setPainting(level.getPainting());
+        paintingView.setPainting(savedGame.level.getPainting());
         paintingView.setColors(LevelUtils.getColor1(), LevelUtils.getColor2(), LevelUtils.getColor3(), LevelUtils.getColor4());
-        paintingView.setColorArray(colorArray);
+        paintingView.setColorArray(savedGame.colorArray);
         paintingView.setEnabled(false);
 
         return view;
@@ -109,11 +106,9 @@ public class VictoryScreenFragment extends Fragment {
             .commit();
     }
 
-    public static VictoryScreenFragment newInstance(LevelDto level, long totalTime, Colour[] colorArray) {
+    public static VictoryScreenFragment newInstance(SavedGame savedGame) {
         Bundle args = new Bundle();
-        args.putSerializable(LEVEL_KEY, level);
-        args.putLong(TOTAL_TIME_KEY, totalTime);
-        args.putSerializable(COLOR_ARRAY_KEY, colorArray);
+        args.putSerializable(COMPLETED_GAME_KEY, savedGame);
         VictoryScreenFragment fragment = new VictoryScreenFragment();
         fragment.setArguments(args);
         return fragment;

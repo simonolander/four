@@ -1,5 +1,7 @@
 package se.olander.android.four;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,8 +12,6 @@ import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
 
 import java.util.List;
 import java.util.Stack;
@@ -209,18 +209,26 @@ public class LevelFragment extends Fragment {
     }
 
     private void victory() {
-        Toast.makeText(getContext(), "All done :)", Toast.LENGTH_SHORT).show();
+        SavedGame savedGame = new SavedGame(
+            level,
+            System.currentTimeMillis() - timeStart,
+            paintingView.getColorArray()
+        );
+        saveGame(savedGame);
         FragmentManager manager = getFragmentManager();
         assert manager != null;
         manager.popBackStack();
         manager
             .beginTransaction()
-            .replace(R.id.fragment_container, VictoryScreenFragment.newInstance(
-                level,
-               System.currentTimeMillis() - timeStart,
-                paintingView.getColorArray()))
+            .replace(
+                R.id.fragment_container,
+                VictoryScreenFragment.newInstance(savedGame))
             .addToBackStack(null)
             .commit();
+    }
+
+    private void saveGame(SavedGame game) {
+        SaveGameUtils.saveGame(getContext(), game);
     }
 
     public static Fragment newInstance(@NonNull LevelDto level) {
