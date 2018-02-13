@@ -1,6 +1,7 @@
 package se.olander.android.four;
 
 import android.graphics.PointF;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -35,6 +36,11 @@ public class Graph {
     }
 
     public Graph addNode(Node node) {
+        for (Node node1 : nodes) {
+            if (node1.point.equals(node.point)) {
+                throw new IllegalArgumentException("Point " + node.point + " already exists");
+            }
+        }
         nodes.add(node);
         neighboursMap.put(node, new ArrayList<Node>());
         return this;
@@ -45,6 +51,9 @@ public class Graph {
     }
 
     public Graph connect(Node n1, Node n2) {
+        if (n1.equals(n2)) {
+            throw new IllegalArgumentException("n1 and n2 can't be equal");
+        }
         neighboursMap.get(n1).add(n2);
         neighboursMap.get(n2).add(n1);
         return this;
@@ -76,6 +85,42 @@ public class Graph {
         return getNeighbours(n1).contains(nodes.get(n2));
     }
 
+    public boolean areNeighbours(Node n1, Node n2) {
+        return getNeighbours(n1).contains(n2);
+    }
+
+    public boolean edgeWouldIntersectAnotherEdge(Node n1, Node n2) {
+        for (Node n3 : nodes) {
+            if (n1.equals(n3) || n2.equals(n3)) {
+                continue;
+            }
+            for (Node n4 : getNeighbours(n3)) {
+                if (n1.equals(n4) || n2.equals(n4)) {
+                    continue;
+                }
+                if (MathUtils.linesIntersect(n1.point, n2.point, n3.point, n4.point)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void connectAllShortest() {
+        List<UEdge> possibleEdges = new ArrayList<>();
+        for (int i1 = 0; i1 < nodes.size(); i1++) {
+            for (int i2 = i1 + 1; i2 < nodes.size(); i2++) {
+                possibleEdges.add(new UEdge(nodes.get(i1), nodes.get(i2)));
+            }
+        }
+        possibleEdges.sort(new UEdge.DistanceComparator());
+        for (UEdge edge : possibleEdges) {
+            if (!edgeWouldIntersectAnotherEdge(edge.n1, edge.n2)) {
+                connect(edge.n1, edge.n2);
+            }
+        }
+    }
+
     public Graph build() {
         removeUnnecessaryNodes();
         sortNeighbours();
@@ -104,38 +149,6 @@ public class Graph {
 
     private void removeBoundaryFace() {
         faces.remove(getBoundaryFace());
-    }
-
-    private void mergeFaces() {
-        Random random = new Random(0);
-        int iterations = 0;
-        again: while (iterations < 1000) {
-            iterations += 1;
-            List<Integer> indices = new ArrayList<>();
-            for (int i = 0; i < faces.size(); i++) {
-                indices.add(i);
-            }
-            Collections.shuffle(indices, random);
-            for (Integer index : indices) {
-                Face f1 = faces.get(index);
-                for (Face f2 : faceNeighboursMap.get(f1)) {
-                    if (Face.numFacesInCommon(f1, f2) == 1) {
-                        Face merged = Face.mergeFaces(f1, f2);
-                        faces.remove(f1);
-                        faces.remove(f2);
-                        faces.add(merged);
-                        Set<Face> mergedNeighbours = new HashSet<>();
-                        mergedNeighbours.addAll(faceNeighboursMap.get(f1));
-                        mergedNeighbours.addAll(faceNeighboursMap.get(f2));
-                        mergedNeighbours.remove(f1);
-                        mergedNeighbours.remove(f2);
-                        faceNeighboursMap.put(merged, mergedNeighbours);
-                        continue again;
-                    }
-                }
-            }
-            break;
-        }
     }
 
     public Painting computePainting() {
@@ -219,6 +232,10 @@ public class Graph {
             faceNodes.add(node);
             faceNodes.add(neighbour);
             traverseFace(faceNodes, visitedEdges);
+            // TODO Remove check
+            if (faceNodes.get(0).equals(faceNodes.get(faceNodes.size() - 1))) {
+                faceNodes.remove(faceNodes.size() - 1);
+            }
             faces.add(new Face(faceNodes));
         }
         return faces;
@@ -237,6 +254,74 @@ public class Graph {
             faceNodes.add(next);
             last = current;
             current = next;
+        }
+    }
+
+    public Graph copy() {
+        Graph graph = new Graph();
+        for (Node node : nodes) {
+            graph.addNode(node.point);
+        }
+        HashMap<Node, Integer> indexMap = new HashMap<>();
+        for (int i = 0; i < nodes.size(); i++) {
+            indexMap.put(nodes.get(i), i);
+        }
+        for (int i1 = 0; i1 < nodes.size(); i1++) {
+            for (Node n2 : getNeighbours(i1)) {
+                int i2 = indexMap.get(n2);
+                if (i2 > i1) {
+                    graph.connect(i1, i2);
+                }
+            }
+        }
+        return graph;
+    }
+
+    private void dfsMaze(Random random) {
+        Graph faceGraph = copy().build();
+        for (Node node : faceGraph.nodes) {
+            Log.d(TAG, "dfsMaze: " + node);
+        }
+        Face currentFace = faceGraph.faces.get(random.nextInt(faceGraph.faces.size()));
+        dfsMaze(currentFace, faceGraph, new HashSet<Face>(), new HashSet<Face>(), random);
+    }
+
+    private void dfsMaze(Face currentFace, Graph faceGraph, Set<Face> currentRoom, Set<Face> visited, Random random) {
+        visited.add(currentFace);
+        currentRoom.add(currentFace);
+        List<Face> neighbourFaces = new ArrayList<>(faceGraph.faceNeighboursMap.get(currentFace));
+        Collections.shuffle(neighbourFaces, random);
+        boolean branched = false;
+        for (Face face : neighbourFaces) {
+            if (visited.contains(face)) {
+                continue;
+            }
+
+            boolean adjacentToCurrentRoom = false;
+            for (Face f2 : faceGraph.faceNeighboursMap.get(face)) {
+                if (f2.equals(currentFace)) {
+                    continue;
+                }
+                if (currentRoom.contains(f2)) {
+                    adjacentToCurrentRoom = true;
+                    break;
+                }
+            }
+            if (adjacentToCurrentRoom) {
+                continue;
+            }
+
+            UEdge commonEdge = currentFace.findSingleCommonEdge(face);
+            int i1 = faceGraph.indexOf(commonEdge.n1);
+            int i2 = faceGraph.indexOf(commonEdge.n2);
+            if (branched) {
+                dfsMaze(face, faceGraph, new HashSet<Face>(), visited, random);
+            }
+            else {
+                disconnect(i1, i2);
+                dfsMaze(face, faceGraph, currentRoom, visited, random);
+            }
+            branched = true;
         }
     }
 
@@ -334,8 +419,6 @@ public class Graph {
             }
         }
 
-        printWallGraph(wallGraph, width + 1, height + 1);
-
         return wallGraph;
     }
 
@@ -429,6 +512,23 @@ public class Graph {
         Log.d(TAG, "printWallGraph: " + builder.toString());
     }
 
+    public static Graph sunflower(int numberOfPoints, float alpha) {
+        float radius = 900;
+        Graph graph = new Graph();
+        int numberOfBoundaryPoints = (int) Math.round(alpha * Math.sqrt(numberOfPoints));
+        for (int i = 0; i < numberOfPoints; i++) {
+            float r = i + 1 > numberOfPoints - numberOfBoundaryPoints
+                ? 1
+                : (float) (Math.sqrt(i + 0.5) / Math.sqrt(numberOfPoints - (numberOfBoundaryPoints + 1) / 2));
+            float theta = MathUtils.TAU * (i + 1) / (MathUtils.PHI * MathUtils.PHI);
+            PointF point = new PointF(r * radius * MathUtils.cos(theta), r * radius * MathUtils.sin(theta));
+            graph.addNode(point);
+        }
+        graph.connectAllShortest();
+        graph.dfsMaze(new Random());
+        return graph;
+    }
+
     public static class Coord {
         public int x, y;
 
@@ -453,6 +553,20 @@ public class Graph {
             int result = x;
             result = 31 * result + y;
             return result;
+        }
+    }
+
+    private static class DistanceComparator implements Comparator<Node> {
+
+        private final Node node;
+
+        public DistanceComparator(@NonNull Node node) {
+            this.node = node;
+        }
+
+        @Override
+        public int compare(Node n1, Node n2) {
+            return Float.compare(MathUtils.distanceSquared(node.point, n1.point), MathUtils.distanceSquared(node.point, n2.point));
         }
     }
 }

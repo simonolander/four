@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
+import java.util.Random;
 import java.util.Stack;
 
 public class LevelFragment extends Fragment {
@@ -59,7 +60,8 @@ public class LevelFragment extends Fragment {
 
         paintingView = view.findViewById(R.id.painting);
         paintingView.setColors(LevelUtils.getColor1(), LevelUtils.getColor2(), LevelUtils.getColor3(), LevelUtils.getColor4());
-        paintingView.setPainting(level.getPainting());
+//        paintingView.setPainting(level.getPainting());
+        paintingView.setPainting(Graph.sunflower(500, 2).build().computePainting());
         paintingView.setOnRegionClickListener(new PaintingView.OnRegionClickListener() {
             @Override
             public void onRegionClick(Painting.PaintRegion region) {

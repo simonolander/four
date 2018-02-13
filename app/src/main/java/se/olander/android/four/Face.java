@@ -12,6 +12,9 @@ public class Face {
     public List<Node> nodes;
 
     public Face(List<Node> nodes) {
+        if (nodes.size() < 3) {
+            throw new IllegalArgumentException("Cannot make a face with less than 3 nodes: " + nodes);
+        }
         this.nodes = nodes;
         this.edgeList = new ArrayList<>(nodes.size());
         for (int i1 = 0; i1 < nodes.size(); i1++) {
@@ -91,5 +94,28 @@ public class Face {
             }
         }
         return containsNode;
+    }
+
+    public List<UEdge> findCommonEdges(Face other) {
+        ArrayList<UEdge> edges = new ArrayList<>();
+        for (UEdge edge : other.edgeSet) {
+            if (this.edgeSet.contains(edge)) {
+                edges.add(edge);
+            }
+        }
+        return edges;
+    }
+
+    public UEdge findSingleCommonEdge(Face other) {
+        List<UEdge> edges = findCommonEdges(other);
+        if (edges.size() == 1) {
+            return edges.get(0);
+        }
+        else if (edges.size() == 0) {
+            throw new IllegalStateException("No common edges: " + this.edgeList + ", " + other.edgeList);
+        }
+        else {
+            throw new IllegalStateException("Found " + edges.size() + " common edges: " + this.edgeList + ", " + other.edgeList + ", " + edges);
+        }
     }
 }

@@ -4,7 +4,12 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.support.annotation.Nullable;
 
+import java.util.Random;
+
 public abstract class MathUtils {
+
+    public static final float TAU = (float) (Math.PI * 2);
+    public static final float PHI = (float) ((Math.sqrt(5) + 1) / 2);
 
     /**
      * Tells whether the two line segments cross.
@@ -62,6 +67,10 @@ public abstract class MathUtils {
         return (AvB * AvC <= 0.0) && (BvC * (AvB + BvC - AvC) <= 0.0);
     }
 
+    public static boolean linesIntersect(PointF p11, PointF p12, PointF p21, PointF p22) {
+        return linesIntersect(p11.x, p11.y, p12.x, p12.y, p21.x, p21.y, p22.x, p22.y);
+    }
+
     @Nullable
     public static PointF getIntersectionPoint(PointF p11, PointF p12, PointF p21, PointF p22) {
         return getIntersectionPoint(p11.x, p11.y, p12.x, p12.y, p21.x, p21.y, p22.x, p22.y);
@@ -117,6 +126,10 @@ public abstract class MathUtils {
         return (float) Math.cos(rads);
     }
 
+    public static float sin(float rads) {
+        return (float) Math.sin(rads);
+    }
+
     public static float cross(float x1, float y1, float x2, float y2) {
         return x1 * y2 - x2 * y1;
     }
@@ -129,5 +142,15 @@ public abstract class MathUtils {
             }
         }
         return occurrences;
+    }
+
+    public static PointF randomPointInCircle(float radius, Random random) {
+        float r = random.nextFloat() * radius;
+        float rads = random.nextFloat() * TAU;
+        return new PointF(r * cos(rads), r * sin(rads));
+    }
+
+    public static float distanceSquared(PointF p1, PointF p2) {
+        return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
     }
 }

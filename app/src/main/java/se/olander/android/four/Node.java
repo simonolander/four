@@ -12,4 +12,11 @@ public class Node {
     public Node(PointF point) {
         this.point = point;
     }
+
+    @Override
+    public String toString() {
+        return "Node{" +
+            "point=" + point +
+            '}';
+    }
 }
