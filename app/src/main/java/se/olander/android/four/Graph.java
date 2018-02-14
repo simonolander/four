@@ -130,6 +130,29 @@ public class Graph {
         return this;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Graph graph = (Graph) o;
+
+        if (nodes != null ? !nodes.equals(graph.nodes) : graph.nodes != null) return false;
+        if (neighboursMap != null ? !neighboursMap.equals(graph.neighboursMap) : graph.neighboursMap != null)
+            return false;
+        if (faces != null ? !faces.equals(graph.faces) : graph.faces != null) return false;
+        return faceNeighboursMap != null ? faceNeighboursMap.equals(graph.faceNeighboursMap) : graph.faceNeighboursMap == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = nodes != null ? nodes.hashCode() : 0;
+        result = 31 * result + (neighboursMap != null ? neighboursMap.hashCode() : 0);
+        result = 31 * result + (faces != null ? faces.hashCode() : 0);
+        result = 31 * result + (faceNeighboursMap != null ? faceNeighboursMap.hashCode() : 0);
+        return result;
+    }
+
     private void removeUnnecessaryNodes() {
         again: while (true) {
             for (Node node : nodes) {
@@ -279,9 +302,6 @@ public class Graph {
 
     private void dfsMaze(Random random) {
         Graph faceGraph = copy().build();
-        for (Node node : faceGraph.nodes) {
-            Log.d(TAG, "dfsMaze: " + node);
-        }
         Face currentFace = faceGraph.faces.get(random.nextInt(faceGraph.faces.size()));
         dfsMaze(currentFace, faceGraph, new HashSet<Face>(), new HashSet<Face>(), random);
     }

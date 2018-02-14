@@ -118,4 +118,25 @@ public class Face {
             throw new IllegalStateException("Found " + edges.size() + " common edges: " + this.edgeList + ", " + other.edgeList + ", " + edges);
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Face face = (Face) o;
+
+        if (edgeSet != null ? !edgeSet.equals(face.edgeSet) : face.edgeSet != null) return false;
+        if (edgeList != null ? !edgeList.equals(face.edgeList) : face.edgeList != null)
+            return false;
+        return nodes != null ? nodes.equals(face.nodes) : face.nodes == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = edgeSet != null ? edgeSet.hashCode() : 0;
+        result = 31 * result + (edgeList != null ? edgeList.hashCode() : 0);
+        result = 31 * result + (nodes != null ? nodes.hashCode() : 0);
+        return result;
+    }
 }

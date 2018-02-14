@@ -19,4 +19,19 @@ public class Node {
             "point=" + point +
             '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Node node = (Node) o;
+
+        return point != null ? point.equals(node.point) : node.point == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return point != null ? point.hashCode() : 0;
+    }
 }
