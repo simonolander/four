@@ -60,8 +60,7 @@ public class LevelFragment extends Fragment {
 
         paintingView = view.findViewById(R.id.painting);
         paintingView.setColors(LevelUtils.getColor1(), LevelUtils.getColor2(), LevelUtils.getColor3(), LevelUtils.getColor4());
-//        paintingView.setPainting(level.getPainting());
-        paintingView.setPainting(Graph.sunflower(500, 2).build().computePainting());
+        paintingView.setPainting(level.getPainting());
         paintingView.setOnRegionClickListener(new PaintingView.OnRegionClickListener() {
             @Override
             public void onRegionClick(Painting.PaintRegion region) {

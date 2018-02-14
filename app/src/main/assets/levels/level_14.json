@@ -1,0 +1,10 @@
+{
+  "type": "SUNFLOWER_DFS_MAZE",
+  "id": "54BCAC03-A3CD-4D2A-8FC7-A0E8EFFE3318",
+  "version": 1,
+  "ordinal": 13,
+  "name": "Sunflower 200",
+  "numberOfPoints": 200,
+  "alpha": 2.0,
+  "seed": 0
+}

@@ -19,10 +19,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by sios on 2017-12-23.
- */
-
 class LevelUtils {
     private static LevelDto parserLevelDto(Reader reader) throws IOException {
         Gson gson = new Gson();
@@ -33,6 +29,8 @@ class LevelUtils {
                 return gson.fromJson(json, RawLevelDto.class);
             case SQUARE_DFS_MAZE:
                 return gson.fromJson(json, SquareMazeLevelDto.class);
+            case SUNFLOWER_DFS_MAZE:
+                return gson.fromJson(json, SunflowerMazeLevelDto.class);
             default:
                 throw new JsonParseException("Unknown level type: " + levelDtoMeta.type);
         }

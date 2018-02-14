@@ -12,7 +12,7 @@ public abstract class LevelDto implements Comparable<LevelDto>, Serializable {
 
     public enum Type {
         RAW,
-        SQUARE_DFS_MAZE
+        SUNFLOWER_DFS_MAZE, SQUARE_DFS_MAZE
     }
 
     public int version;

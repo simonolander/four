@@ -512,7 +512,7 @@ public class Graph {
         Log.d(TAG, "printWallGraph: " + builder.toString());
     }
 
-    public static Graph sunflower(int numberOfPoints, float alpha) {
+    public static Graph sunflower(int numberOfPoints, float alpha, Random random) {
         float radius = 900;
         Graph graph = new Graph();
         int numberOfBoundaryPoints = (int) Math.round(alpha * Math.sqrt(numberOfPoints));
@@ -525,7 +525,7 @@ public class Graph {
             graph.addNode(point);
         }
         graph.connectAllShortest();
-        graph.dfsMaze(new Random());
+        graph.dfsMaze(random);
         return graph;
     }
 
